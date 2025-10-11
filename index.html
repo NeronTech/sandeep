@@ -9,6 +9,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
 
   <!-- Manifest -->
+  <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#e91e63">
 
   <!-- iOS Support -->
@@ -19,7 +20,10 @@
 <body class="m-0 p-0 h-screen overflow-hidden bg-white text-gray-900">
 
   <!-- Fullscreen iframe -->
-  <iframe src="https://script.google.com/macros/s/AKfycbxPWcFOsE8eEgqa5KYXWKbBgolbB5stzmozYsoVJYgiP513XkWebib0HGOenjsnjMU/exec" width="100%" height="100%"></iframe>
+  <iframe 
+    src="https://script.google.com/macros/s/AKfycbxPWcFOsE8eEgqa5KYXWKbBgolbB5stzmozYsoVJYgiP513XkWebib0HGOenjsnjMU/exec"
+    class="w-full h-full border-0">
+  </iframe>
 
   <!-- Install App Button -->
   <div id="installPrompt" class="fixed bottom-4 left-4 hidden">
@@ -45,6 +49,12 @@
       console.log('Install outcome:', outcome);
       deferredPrompt = null;
     });
+
+    // Register service worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js')
+        .then(() => console.log('Service Worker registered'));
+    }
   </script>
 </body>
 </html>

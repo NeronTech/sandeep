@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sandeeps – Smoothies & Snacks</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Manifest -->
+  <meta name="theme-color" content="#e91e63">
+
+  <!-- iOS Support -->
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+</head>
+<body class="m-0 p-0 h-screen overflow-hidden bg-white text-gray-900">
+
+  <!-- Fullscreen iframe -->
+  <iframe 
+    src="https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec"
+    class="w-full h-full border-0">
+  </iframe>
+
+  <!-- Install App Button -->
+  <div id="installPrompt" class="fixed bottom-4 left-4 hidden">
+    <button class="bg-pink-600 hover:bg-pink-700 text-white font-bold py-2 px-4 rounded shadow-md">
+      Install App
+    </button>
+  </div>
+
+  <script>
+    let deferredPrompt;
+
+    // Handle install prompt
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      document.getElementById('installPrompt').classList.remove('hidden');
+    });
+
+    document.getElementById('installPrompt').addEventListener('click', async () => {
+      document.getElementById('installPrompt').classList.add('hidden');
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      console.log('Install outcome:', outcome);
+      deferredPrompt = null;
+    });
+  </script>
+</body>
+</html>
+
+
+
+
+

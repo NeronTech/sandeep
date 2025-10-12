@@ -1,4 +1,5 @@
-const GAS_URL = "https://script.google.com/a/~/macros/s/AKfycbxLoj4AJMH8erDKeRodxmOqQrCdAVy1q2ajB3A9buu9eGv_GKh4RHGHZmrAV7-ZBgwC/exec"; // ← replace
+const GAS_URL = "https://script.google.com/macros/s/AKfycbxLoj4AJMH8erDKeRodxmOqQrCdAVy1q2ajB3A9buu9eGv_GKh4RHGHZmrAV7-ZBgwC/exec"; 
+// Make sure this is your latest public deployment URL
 
 const video = document.getElementById("camera");
 const preview = document.getElementById("preview");
@@ -7,10 +8,10 @@ let faceData = null;
 // Start camera safely
 async function startCamera() {
   try {
-    const stream = await navigator.mediaDevices.getUserMedia({ video:{facingMode:"user"} });
+    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
     video.srcObject = stream;
   } catch (err) {
-    alert("Camera error: " + err.message);
+    showMsg("📷 Camera error: " + err.message);
   }
 }
 
@@ -19,22 +20,22 @@ document.addEventListener("DOMContentLoaded", startCamera);
 // Capture face
 document.getElementById("captureBtn").onclick = () => {
   const canvas = document.createElement("canvas");
-  canvas.width = video.videoWidth;
-  canvas.height = video.videoHeight;
+  canvas.width = video.videoWidth || 250;
+  canvas.height = video.videoHeight || 180;
   const ctx = canvas.getContext("2d");
   ctx.drawImage(video, 0, 0);
   faceData = canvas.toDataURL("image/png");
   preview.src = faceData;
   preview.hidden = false;
-  showMsg("Face captured ✅");
+  showMsg("✅ Face captured");
 };
 
 // Register
 document.getElementById("registerBtn").onclick = async () => {
   const email = emailVal();
   const password = passVal();
-  if (!faceData) return showMsg("Capture face first!");
-  const res = await sendToGAS({ action:"register", email, password, face:faceData });
+  if (!faceData) return showMsg("⚠️ Capture your face first!");
+  const res = await sendToGAS({ action: "register", email, password, face: faceData });
   showMsg(res.message);
 };
 
@@ -42,21 +43,28 @@ document.getElementById("registerBtn").onclick = async () => {
 document.getElementById("loginBtn").onclick = async () => {
   const email = emailVal();
   const password = passVal();
-  const res = await sendToGAS({ action:"login", email, password });
+  const res = await sendToGAS({ action: "login", email, password });
   showMsg(res.message);
 };
 
-function emailVal(){ return document.getElementById("email").value.trim(); }
-function passVal(){ return document.getElementById("password").value.trim(); }
+// Helpers
+function emailVal() { return document.getElementById("email").value.trim(); }
+function passVal() { return document.getElementById("password").value.trim(); }
 
-async function sendToGAS(payload){
-  const r = await fetch(GAS_URL, {
-    method: "POST",
-    mode: "cors",
-    headers: { "Content-Type":"application/json" },
-    body: JSON.stringify(payload)
-  });
-  return await r.json();
+async function sendToGAS(payload) {
+  try {
+    const r = await fetch(GAS_URL, {
+      method: "POST",
+      mode: "cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    if (!r.ok) throw new Error("Network response was not ok");
+    return await r.json();
+  } catch (err) {
+    showMsg("❌ Request failed: " + err.message);
+    return { message: err.message };
+  }
 }
 
-function showMsg(m){ document.getElementById("msg").textContent = m; }
+function showMsg(m) { document.getElementById("msg").textContent = m; }

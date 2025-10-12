@@ -1,8 +1,10 @@
 {
   "name": "Sandeeps \u2013 Smoothies & Snacks",
   "short_name": "Sandeeps",
-  "start_url": "/",
-  "scope": "/",
+  //"start_url": "/",
+  //"scope": "/",
+  "start_url": "https://script.google.com/macros/s/AKfycbxPWcFOsE8eEgqa5KYXWKbBgolbB5stzmozYsoVJYgiP513XkWebib0HGOenjsnjMU/exec",
+  "scope": "https://script.google.com/macros/s/AKfycbxPWcFOsE8eEgqa5KYXWKbBgolbB5stzmozYsoVJYgiP513XkWebib0HGOenjsnjMU/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#F8EDEB",

@@ -1,20 +1,29 @@
 {
-  "name": "Sandeeps – Smoothies & Snacks",
+  "name": "Sandeeps \u2013 Smoothies & Snacks",
   "short_name": "Sandeeps",
-  "start_url": "index.html",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#e91e63",
+  "theme_color": "#F8EDEB",
+  "description": "Fresh smoothies and tasty snacks \u2014 Sandeeps.",
   "icons": [
     {
-      "src": "icons/web-app-manifest-192x192",
+      "src": "icons/web-app-manifest-192x192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "icons/web-app-manifest-512x512",
+      "src": "icons/web-app-manifest-512x512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/logo.svg",
+      "sizes": "1024x1024",
+      "type": "image/svg+xml",
+      "purpose": "any"
     }
   ]
 }

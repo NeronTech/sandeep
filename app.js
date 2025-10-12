@@ -1,4 +1,4 @@
-const GAS_URL = "https://script.google.com/macros/s/AKfycbxLoj4AJMH8erDKeRodxmOqQrCdAVy1q2ajB3A9buu9eGv_GKh4RHGHZmrAV7-ZBgwC/exec"; 
+const GAS_URL = "https://script.google.com/macros/s/AKfycbxk7bZKW1ograYE-_qYiyiUTbnRwnVwPMyGi0Vqz0itbYtqEPmK2G1bifZjmGDgfVnG/exec"; 
 // Make sure this is your latest public deployment URL
 
 const video = document.getElementById("camera");

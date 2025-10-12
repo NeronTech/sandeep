@@ -1,3 +1,13 @@
+const BASE_URL = 'https://nerontech.github.io/sandeep/';
+
+const CACHE_NAME = 'sandeeps-v2';
+const ASSETS = [
+  BASE_URL,
+  BASE_URL + '?offline',
+  BASE_URL + '/icons/logo.svg',
+  BASE_URL + '/icons/web-app-manifest-192x192.png',
+  BASE_URL + '/icons/web-app-manifest-512x512.png'
+];
 const CACHE_NAME = 'sandeeps-v1';
 const ASSETS = [
   '/',

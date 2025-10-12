@@ -1,4 +1,4 @@
-const GAS_URL = "https://script.google.com/macros/s/AKfycb.../exec"; // ← replace
+const GAS_URL = "https://script.google.com/macros/s/AKfycbzD1gBEygS0PTMRM0Y7XHkgOyRi0UGHkwfG9M98sB6jHIMoPlg6FSu5kmIBMtZj2UER/exec"; // ← replace
 
 const video = document.getElementById("camera");
 const preview = document.getElementById("preview");

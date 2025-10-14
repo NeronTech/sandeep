@@ -1,4 +1,4 @@
-const GAS_URL = "https://script.google.com/macros/s/AKfycbxk7bZKW1ograYE-_qYiyiUTbnRwnVwPMyGi0Vqz0itbYtqEPmK2G1bifZjmGDgfVnG/exec"; 
+const GAS_URL = "https://script.google.com/macros/s/AKfycbzMwdWYukYcz0jUJP9h5CT23Br7rH_Fa4m5gj_5Bt40E5yImN2OM5TeFfAvJFshmqPb/exec";  
 // Make sure this is your latest public deployment URL
 
 const video = document.getElementById("camera");
@@ -54,9 +54,9 @@ function passVal() { return document.getElementById("password").value.trim(); }
 async function sendToGAS(payload) {
   try {
     const r = await fetch(GAS_URL, {
+      redirect: "follow",
       method: "POST",
-      mode: "cors",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
       body: JSON.stringify(payload)
     });
     if (!r.ok) throw new Error("Network response was not ok");

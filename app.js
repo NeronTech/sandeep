@@ -1,9 +1,6 @@
 const GAS_URL =
-  "https://script.google.com/macros/s/AKfycbxHLD_Hv1Jg-8hnjMQd20MFsek65jOn62j2wX17FnyLd3Q1iKmgpWNyAcnZz4McRRUs/exec";
+  "https://script.google.com/macros/s/AKfycby1hHmuf-jvJrPXly5sGB3jEj7eCCm-_KLZWUUn2YbatBDEI0ypiRhuxkwJGEumP4m9/exec";
 // Make sure this is your latest public deployment URL
-
-//on load, start.......
-// document.addEventListener("DOMContentLoaded", startCamera);
 
 document.addEventListener("DOMContentLoaded", loadMenu);
 const menuContainer = document.getElementById("menuItems");
@@ -24,6 +21,7 @@ const toastFaceRec = document.getElementById("toastFaceRec");
 const loader = document.getElementById("loader");
 const regVideo = document.getElementById("regVideo");
 const orderForm = document.getElementById("orderForm");
+const contactForm = document.getElementById("contactForm");
 
 document.getElementById("scanner").style.display = "none";
 
@@ -36,18 +34,6 @@ document.getElementById("cartBtnMobile").addEventListener("click", () => {
 mobileMenuBtn.addEventListener("click", () => {
   mobileMenu.classList.toggle("hidden");
 });
-
-// const userList = document.getElementById("userList");
-// === Load all users ===
-// document.getElementById("loadUsers").addEventListener("click", async () => {
-//   try {
-//     const res = await fetch(GAS_URL);
-//     const data = await res.json();
-//     userList.textContent = JSON.stringify(data.users, null, 2);
-//   } catch (err) {
-//     userList.textContent = "Error loading users: " + err.message;
-//   }
-// });
 
 // ======= CART & ORDER STATE =======
 let cart = [];
@@ -80,6 +66,10 @@ function showToaster(msg, color = "#16a34a") {
 
 function showLoader(show) {
   loader.style.display = show ? "flex" : "none";
+}
+
+function showMsg(m) {
+  document.getElementById("msg").textContent = m;
 }
 
 // === Feature button toggle ===
@@ -131,27 +121,6 @@ function renderMenu(items) {
 
   menuContainer.innerHTML = ""; // Clear previous
 
-  // items.forEach(item => {
-  //   const description = item.description || item.descriptio || "";
-
-  //   const card = document.createElement('div');
-  //   card.className =
-  //     'bg-white rounded-xl shadow-lg overflow-hidden flex flex-col items-center p-4 m-2 w-full max-w-xs transition hover:shadow-2xl hover:-translate-y-2 hover:scale-105';
-
-  //   card.innerHTML = `
-  //     <img src="${item.imageUrl}" alt="${item.name}" class="w-40 h-40 object-cover rounded-lg mb-3 shadow" />
-  //     <div class="text-xs text-pink-500 font-semibold mb-1">${item.category}</div>
-  //     <div class="font-bold text-lg mb-1">${item.name}</div>
-  //     <div class="text-gray-600 mb-2">${description}</div>
-  //     <div class="font-semibold text-orange-600 mb-3">$${item.price.toFixed(2)}</div>
-  //     <button
-  //       class="add-to-cart-btn bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-full transition"
-  //       data-name="${item.name}"
-  //       data-price="${item.price}"
-  //     >Add to Cart</button>
-  //   `;
-  //   menuContainer.appendChild(card);
-  // });
   items.forEach((item) => {
     const card = document.createElement("div");
     card.className =
@@ -318,35 +287,6 @@ async function startCamera(videoElement) {
   }
 }
 
-// const video = document.getElementById("camera");
-// const preview = document.getElementById("preview");
-// let faceData = null;
-
-// // Start camera safely
-// async function startCamera() {
-//   try {
-//     const stream = await navigator.mediaDevices.getUserMedia({
-//       video: { facingMode: "user" },
-//     });
-//     video.srcObject = stream;
-//   } catch (err) {
-//     showMsg("📷 Camera error: " + err.message);
-//   }
-// }
-
-// Capture face
-// document.getElementById("captureBtn").onclick = () => {
-//   const canvas = document.createElement("canvas");
-//   canvas.width = video.videoWidth || 250;
-//   canvas.height = video.videoHeight || 180;
-//   const ctx = canvas.getContext("2d");
-//   ctx.drawImage(video, 0, 0);
-//   faceData = canvas.toDataURL("image/png");
-//   preview.src = faceData;
-//   preview.hidden = false;
-//   showMsg("✅ Face captured");
-// };
-
 let regDescriptor = null;
 let regFaceImage = null;
 
@@ -387,20 +327,6 @@ function stopCamera(videoElement) {
   videoElement.srcObject = null;
 }
 
-// Helpers
-// function nameVal() {
-//   return document.getElementById("email").value.trim();
-// }
-// function contactVal() {
-//   return document.getElementById("email").value.trim();
-// }
-// function emailVal() {
-//   return document.getElementById("email").value.trim();
-// }
-// function paymentVal() {
-//   return document.getElementById("password").value.trim();
-// }
-
 // On order form submit
 document.getElementById("orderForm").addEventListener("submit", (e) => {
   e.preventDefault();
@@ -436,13 +362,6 @@ document.getElementById("orderForm").addEventListener("submit", (e) => {
     paymentMethod,
   };
 
-  // google.script.run.withSuccessHandler(msg => {
-  //   showToast(msg);
-  //   cart = [];
-  //   updateCartCount();
-  //   closeOrderModal();
-  //   e.target.reset();
-  // }).submitOrder(order);
   submitOrder(order);
   registerUser(user);
 });
@@ -502,12 +421,47 @@ async function submitOrder(order) {
     amount,
   });
   showLoader(true);
-  showToast(msg);
+  showToast('Order placed successfully! We will contact you soon.');
   cart = [];
   updateCartCount();
   closeOrderModal();
   orderForm.reset();
   // showMsg(res.message);
+}
+
+// Form submission
+document.getElementById("contactForm").addEventListener("submit", (e) =>{
+  e.preventDefault();
+  const data = {
+    name: e.target.contact_name.value.trim(),
+    email: e.target.contact_email.value.trim(),
+    message: e.target.contact_message.value.trim(),
+  };
+  contactForm.querySelector("button").disabled = true;
+
+  submitContactUs(data);
+});
+
+async function submitContactUs(data) {
+  const name = data.name;
+  const email = data.email;
+  const message = data.message;
+
+  if (!name || !email || !message) {
+    showToast("Please fill all required fields.");
+    return;
+  }
+
+  const res = await sendToGAS({
+    action: "contact-us",
+    name,
+    email,
+    message,
+  });
+  showLoader(true);
+  showToast('Message sent. We will get back to you soon!');
+  contactForm.reset();
+  showLoader(false);
 }
 
 // // Login
@@ -532,8 +486,4 @@ async function sendToGAS(payload) {
     showMsg("❌ Request failed: " + err.message);
     return { message: err.message };
   }
-}
-
-function showMsg(m) {
-  document.getElementById("msg").textContent = m;
 }

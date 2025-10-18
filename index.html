@@ -894,43 +894,96 @@
             <span id="orderTotal">$0.00</span>
           </div>
 
-          <div
-            id="scanner"
-            class="text-center"
-            style="display: none !important"
-          >
-            <p class="text-xs font-bold">
-              Scan your face to skip filling out the form next time.
-            </p>
-            <button id="faceRegBtn">
-              <i
-                class="ri-qr-scan-2-line"
-                style="font-size: 48px; color: #3b82f6"
-              ></i>
+          <!-- Tab Buttons -->
+          <div class="flex justify-center gap-3 mb-6">
+            <button
+              class="tab-btn px-2 py-1 text-xs rounded-lg bg-white text-gray-600 border border-gray-300 hover:bg-gray-100 transition"
+              data-target="tab1"
+            >
+              Input & Register Face Scan
+            </button>
+            <button
+              class="tab-btn px-2 py-1 text-xs rounded-lg bg-white text-gray-600 border border-gray-300 hover:bg-gray-100 transition"
+              data-target="tab2"
+            >
+              Login with face scan
+            </button>
+            <button
+              class="tab-btn px-2 py-1 text-xs rounded-lg bg-white text-gray-600 border border-gray-300 hover:bg-gray-100 transition"
+              data-target="tab3"
+            >
+              Input Only
             </button>
           </div>
 
-          <div id="cameraReg" class="hidden">
-            <video
-              id="regVideo"
-              autoplay
-              playsinline
-              class="w-full rounded-lg mt-4"
-            ></video
-            ><br />
-            <div class="text-center">
+          <!-- Tab Panes -->
+          <div id="tab1" class="tab-pane">
+            <div
+              id="scanner"
+              class="text-center"
+              style="display: none !important"
+            >
+              <p class="text-xs font-bold">
+                Scan your face to skip filling out the form next time.
+              </p>
+              <button id="faceRegBtn">
+                <i
+                  class="ri-qr-scan-2-line"
+                  style="font-size: 48px; color: #3b82f6"
+                ></i>
+              </button>
+            </div>
+            <div id="cameraReg" class="hidden">
+              <video
+                id="regVideo"
+                autoplay
+                playsinline
+                class="w-full rounded-lg mt-4"
+              ></video
+              ><br />
+              <div class="text-center">
+                <button
+                  id="captureRegBtn"
+                  class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                >
+                  Capture Face
+                </button>
+              </div>
+            </div>
+
+            <div id="regPreview" class="hidden">
+              <h4>Preview:</h4>
+              <img id="regFacePreview" />
+            </div>
+          </div>
+          <div id="tab2" class="tab-pane hidden">
+            <div
+              id="scannerLogin"
+              class="text-center"
+              style="display: none !important"
+            >
+              <p class="text-xs font-bold">
+                Scan your face to auto-fill form.
+              </p>
+              <button id="faceLoginBtn">
+                <i
+                  class="ri-qr-scan-2-line"
+                  style="font-size: 48px; color: #3b82f6"
+                ></i>
+              </button>
+            </div>
+            <div id="cameraLogin" class="hidden flex flex-col items-center">
+              <video id="loginVideo" autoplay muted class="rounded-lg"></video>
               <button
-                id="captureRegBtn"
-                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                id="captureLoginBtn"
+                class="mt-3 bg-green-500 text-white px-4 py-2 rounded-md"
               >
                 Capture Face
               </button>
             </div>
           </div>
-
-          <div id="regPreview" class="hidden">
-            <h4>Preview:</h4>
-            <img id="regFacePreview" />
+          <div id="tab3" class="tab-pane hidden">
+            This is the Contact Us tab content.
           </div>
 
           <form id="orderForm" class="space-y-4">

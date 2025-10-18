@@ -1,5 +1,5 @@
 const GAS_URL =
-  "https://script.google.com/macros/s/AKfycby1hHmuf-jvJrPXly5sGB3jEj7eCCm-_KLZWUUn2YbatBDEI0ypiRhuxkwJGEumP4m9/exec";
+  "https://script.google.com/macros/s/AKfycbyEdsuZenfV3PLABXeKh-nbM9U6nV0GKKGq3x3deMrVDUu6KHnwhrTCR4MS1sGkpioO/exec"; //f10
 // Make sure this is your latest public deployment URL
 
 document.addEventListener("DOMContentLoaded", loadMenu);
@@ -72,6 +72,37 @@ function showMsg(m) {
   document.getElementById("msg").textContent = m;
 }
 
+document.addEventListener("DOMContentLoaded", () => {
+  const tabButtons = document.querySelectorAll(".tab-btn");
+  const tabPanes = document.querySelectorAll(".tab-pane");
+
+  tabButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const targetId = btn.dataset.target;
+
+      // Reset button styles
+      tabButtons.forEach((b) => {
+        b.classList.remove("bg-blue-600", "text-white", "shadow-md");
+        b.classList.add("bg-white", "text-black");
+      });
+
+      // Hide all tab panes
+      tabPanes.forEach((pane) => pane.classList.add("hidden"));
+
+      // Activate the clicked button
+      btn.classList.remove("bg-white", "text-black");
+      btn.classList.add("bg-blue-600", "text-white", "shadow-md");
+
+      // Show the corresponding tab content
+      document.getElementById(targetId).classList.remove("hidden");
+    });
+  });
+
+  // Auto-activate the first tab
+  tabButtons[0].click();
+});
+
+
 // === Feature button toggle ===
 document.querySelectorAll(".feature-btn").forEach((btn) => {
   btn.addEventListener("click", () => {
@@ -126,19 +157,17 @@ function renderMenu(items) {
     card.className =
       "bg-white rounded-xl shadow-lg overflow-hidden flex flex-col transform transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 hover:scale-[1.03] hover:ring-2 hover:ring-offset-2 hover:ring-pink-400";
     card.innerHTML = `
-        <img src="${item.imageUrl}" alt="${
-      item.name
-    }" class="h-50 w-full object-cover" />
+        <img src="${item.imageUrl}" alt="${item.name
+      }" class="h-50 w-full object-cover" />
         <div class="p-4 flex flex-col flex-grow">
           <h3 class="font-semibold text-xl mb-1">${item.name}</h3>
           <p class="text-gray-600 flex-grow">${item.descriptio}</p>
           <div class="mt-4 flex items-center justify-between">
             <span class="font-bold text-lg">$${parseFloat(item.price).toFixed(
-              2
-            )}</span>
-            <button class="add-to-cart-btn bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-2 rounded-full hover:from-purple-700 hover:to-pink-700 transition" data-name="${
-              item.name
-            }" data-price="${item.price}">
+        2
+      )}</span>
+            <button class="add-to-cart-btn bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-2 rounded-full hover:from-purple-700 hover:to-pink-700 transition" data-name="${item.name
+      }" data-price="${item.price}">
               Add to Cart
             </button>
           </div>
@@ -175,6 +204,7 @@ function showOrderModal() {
     return;
   }
   document.getElementById("scanner").style.display = "block";
+  document.getElementById("scannerLogin").style.display = "block";
   renderOrderItems();
   orderModal.classList.remove("hidden");
 }
@@ -213,12 +243,10 @@ function renderOrderItems() {
           <p class="text-gray-500 text-sm">$${item.price.toFixed(2)} each</p>
         </div>
         <div class="flex items-center space-x-2">
-          <button class="decrease-btn text-red-500 hover:text-red-700 font-bold px-2" data-name="${
-            item.name
-          }">−</button>
-          <button class="increase-btn text-green-500 hover:text-green-700 font-bold px-2" data-name="${
-            item.name
-          }">+</button>
+          <button class="decrease-btn text-red-500 hover:text-red-700 font-bold px-2" data-name="${item.name
+      }">−</button>
+          <button class="increase-btn text-green-500 hover:text-green-700 font-bold px-2" data-name="${item.name
+      }">+</button>
         </div>
       `;
     orderItemsContainer.appendChild(div);
@@ -430,7 +458,7 @@ async function submitOrder(order) {
 }
 
 // Form submission
-document.getElementById("contactForm").addEventListener("submit", (e) =>{
+document.getElementById("contactForm").addEventListener("submit", (e) => {
   e.preventDefault();
   const data = {
     name: e.target.contact_name.value.trim(),
@@ -464,6 +492,89 @@ async function submitContactUs(data) {
   showLoader(false);
 }
 
+const loginVideo = document.getElementById("loginVideo");
+
+document.getElementById("faceLoginBtn").onclick = async () => {
+  showLoader(true);
+  await loadModels();
+  await startLoginCamera(loginVideo);
+  document.getElementById("cameraLogin").classList.remove("hidden");
+  showToaster("📷 Ready to capture your face for login");
+  showLoader(false);
+};
+
+async function startLoginCamera(videoElement) {
+  try {
+    showLoader(false);
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: false,
+      video: {
+        mandatory: {
+          minAspectRatio: 1.333,
+          maxAspectRatio: 1.334,
+          facingMode: "user",
+        },
+        optional: [{ minFrameRate: 60 }, { maxWidth: 640 }, { maxHeigth: 480 }],
+      },
+    });
+    const videoTracks = stream.getVideoTracks();
+    const track = videoTracks[0];
+    // alert(`Getting video from: ${track.label}`);
+    document.querySelector("#loginVideo").srcObject = stream;
+  } catch (err) {
+    showToaster("⚠️ Camera access denied.", "#dc2626");
+  }
+}
+
+document.getElementById("captureLoginBtn").onclick = async () => {
+  showLoader(true);
+
+  const detections = await faceapi
+    .detectAllFaces(loginVideo)
+    .withFaceLandmarks()
+    .withFaceDescriptors();
+
+  if (detections.length === 0) {
+    showToaster("⚠️ No face detected.", "#dc2626");
+    showLoader(false);
+    return;
+  }
+
+  // Convert face descriptor to JSON
+  const currentDescriptor = JSON.stringify(Array.from(detections[0].descriptor));
+  // console.log("Current Descriptor:", currentDescriptor);
+
+  // Stop camera
+  stopCamera(loginVideo);
+  document.getElementById("cameraLogin").classList.add("hidden");
+  document.getElementById("scannerLogin").style.display = "none";
+
+  // Send descriptor to GAS
+  const res = await sendToGAS({
+    action: "face-login",
+    descriptor: currentDescriptor,
+  });
+
+  console.log("GAS Response:", res);
+  showLoader(false);
+
+  if (res.success) {
+    showToaster(`👋 Welcome back, ${res.data.name}!`);
+    showMsg(`👋 Welcome back, ${res.data.name}!`);
+
+    // ✅ Auto-fill form fields
+    const user = res.data;
+    document.getElementById("customerName").value = user.name || "";
+    document.getElementById("customerContact").value = user.contact || "";
+    document.getElementById("customerEmail").value = user.email || "";
+    document.getElementById("paymentMethod").value = user.payment || "";
+  } else {
+    showToaster("❌ Face not recognized.", "#dc2626");
+  }
+};
+
+
+
 // // Login
 // document.getElementById("loginBtn").onclick = async () => {
 //   const email = emailVal();
@@ -471,6 +582,22 @@ async function submitContactUs(data) {
 //   const res = await sendToGAS({ action: "login", email, password });
 //   showMsg(res.message);
 // };
+
+// async function sendToGASFL(payload) {
+//   try {
+//     const res = await fetch(GAS_URL, {
+//       method: "POST",
+//       headers: { "Content-Type": "text/plain" },
+//       body: JSON.stringify(payload),
+//     });
+
+//     const data = await res.json();
+//     return data;
+//   } catch (err) {
+//     console.error("Fetch error:", err);
+//     return { success: false, message: err.message };
+//   }
+// }
 
 async function sendToGAS(payload) {
   try {

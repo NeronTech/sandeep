@@ -521,7 +521,7 @@ async function startLoginCamera(videoElement) {
     const track = videoTracks[0];
     // alert(`Getting video from: ${track.label}`);
     document.querySelector("#loginVideo").srcObject = stream;
-  } catch (err) {https://chatgpt.com/c/68eb6b3e-d3d8-8323-800a-444a28d579a5
+  } catch (err) {
     showToaster("⚠️ Camera access denied.", "#dc2626");
   }
 }

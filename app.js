@@ -1,5 +1,5 @@
 const GAS_URL =
-  "https://script.google.com/macros/s/AKfycbyEdsuZenfV3PLABXeKh-nbM9U6nV0GKKGq3x3deMrVDUu6KHnwhrTCR4MS1sGkpioO/exec"; //f10
+  "https://script.google.com/macros/s/AKfycbz9gbq_mUdbFUepid_YMTeiJfCIQgrpHyUmxHn-WsJH3RvmNj23sHePscnwACFJ8OWb/exec"; //fl-success
 // Make sure this is your latest public deployment URL
 
 document.addEventListener("DOMContentLoaded", loadMenu);
@@ -555,15 +555,17 @@ document.getElementById("captureLoginBtn").onclick = async () => {
     descriptor: currentDescriptor,
   });
 
-  console.log("GAS Response:", res);
+  // console.log("GAS Response:", res.results.name);
   showLoader(false);
 
-  if (res.success) {
-    showToaster(`👋 Welcome back, ${res.data.name}!`);
-    showMsg(`👋 Welcome back, ${res.data.name}!`);
+  if (res.status === "success") {
+    const user = res.results;
+    showToaster(`👋 Welcome back, ${user.name}!`);
+    showMsg(`👋 Welcome back, ${user.name}!`);
 
     // ✅ Auto-fill form fields
-    const user = res.data;
+    
+    // console.log("User Data:", user);
     document.getElementById("customerName").value = user.name || "";
     document.getElementById("customerContact").value = user.contact || "";
     document.getElementById("customerEmail").value = user.email || "";
@@ -572,32 +574,6 @@ document.getElementById("captureLoginBtn").onclick = async () => {
     showToaster("❌ Face not recognized.", "#dc2626");
   }
 };
-
-
-
-// // Login
-// document.getElementById("loginBtn").onclick = async () => {
-//   const email = emailVal();
-//   const password = passVal();
-//   const res = await sendToGAS({ action: "login", email, password });
-//   showMsg(res.message);
-// };
-
-// async function sendToGASFL(payload) {
-//   try {
-//     const res = await fetch(GAS_URL, {
-//       method: "POST",
-//       headers: { "Content-Type": "text/plain" },
-//       body: JSON.stringify(payload),
-//     });
-
-//     const data = await res.json();
-//     return data;
-//   } catch (err) {
-//     console.error("Fetch error:", err);
-//     return { success: false, message: err.message };
-//   }
-// }
 
 async function sendToGAS(payload) {
   try {

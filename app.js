@@ -375,6 +375,11 @@ document.getElementById("orderForm").addEventListener("submit", (e) => {
     return;
   }
 
+  if (paymentSelect.value === "card") {
+    const valid = validateCardDetails();
+    if (!valid) return;
+  }
+
   const name = e.target.customerName.value.trim();
   const contact = e.target.customerContact.value.trim();
   const email = e.target.customerEmail.value.trim();
@@ -518,6 +523,77 @@ document.getElementById("verifyCodeBtn").onclick = async () => {
     document.getElementById("emailSection").classList.add("verified");
   }
 };
+
+const paymentSelect = document.getElementById("paymentMethod");
+const cardSection = document.getElementById("cardSection");
+const cardNumber = document.getElementById("cardNumber");
+const expiryDate = document.getElementById("expiryDate");
+const cvv = document.getElementById("cvv");
+
+// 1️⃣ Show / Hide card section
+paymentSelect.addEventListener("change", () => {
+  console.log("Payment method changed to:", paymentSelect.value);
+  if (paymentSelect.value === "card") {
+    cardSection.classList.remove("hidden");
+  } else {
+    cardSection.classList.add("hidden");
+  }
+});
+
+// 2️⃣ Format card number as XXXX XXXX XXXX XXXX
+cardNumber.addEventListener("input", (e) => {
+  let val = e.target.value.replace(/\D/g, "");
+  val = val.match(/.{1,4}/g)?.join(" ") || "";
+  e.target.value = val;
+});
+
+// 3️⃣ Format expiry as MM/YY
+expiryDate.addEventListener("input", (e) => {
+  let val = e.target.value.replace(/\D/g, "").slice(0, 4);
+  if (val.length >= 3) val = val.slice(0, 2) + "/" + val.slice(2);
+  e.target.value = val;
+});
+
+// 4️⃣ Validate card before form submit
+async function validateCardDetails() {
+  const number = cardNumber.value.replace(/\s/g, "");
+  const expiry = expiryDate.value;
+  const cvvVal = cvv.value;
+
+  if (!luhnCheck(number)) {
+    showToaster("❌ Invalid card number", "#dc2626");
+    return false;
+  }
+
+  if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(expiry)) {
+    showToaster("❌ Invalid expiry date", "#dc2626");
+    return false;
+  }
+
+  if (!/^\d{3}$/.test(cvvVal)) {
+    showToaster("❌ Invalid CVV", "#dc2626");
+    return false;
+  }
+
+  showToaster("✅ Card validated successfully!", "#16a34a");
+  return true;
+}
+
+// 5️⃣ Luhn algorithm to validate card numbers
+function luhnCheck(num) {
+  let arr = (num + "")
+    .split("")
+    .reverse()
+    .map((x) => parseInt(x));
+  let sum = arr.reduce((acc, val, i) => {
+    if (i % 2) {
+      val *= 2;
+      if (val > 9) val -= 9;
+    }
+    return acc + val;
+  }, 0);
+  return sum % 10 === 0;
+}
 
 // Register
 async function registerUser(user) {

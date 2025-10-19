@@ -85,6 +85,7 @@
         opacity: 0;
         transform: translateY(20px);
         animation: slideInUp 0.3s forwards, fadeOut 0.3s forwards 2.7s;
+        z-index: 99999;
       }
 
       @keyframes slideInUp {
@@ -146,6 +147,20 @@
         align-items: center;
         justify-content: center;
         z-index: 9999;
+      }
+      #msg {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.6);
+        color: white;
+        font-size: 18px;
+        align-items: center;
+        justify-content: center;
+        z-index: 99999;
       }
     </style>
   </head>
@@ -962,9 +977,7 @@
               class="text-center"
               style="display: none !important"
             >
-              <p class="text-xs font-bold">
-                Scan your face to auto-fill form.
-              </p>
+              <p class="text-xs font-bold">Scan your face to auto-fill form.</p>
               <button id="faceLoginBtn">
                 <i
                   class="ri-qr-scan-2-line"
@@ -982,8 +995,8 @@
               </button>
             </div>
           </div>
-          <div id="tab3" class="tab-pane hidden">
-            This is the Contact Us tab content.
+          <div id="tab3" class="tab-pane hidden mb-2">
+            Keep filling out the form below.
           </div>
 
           <form id="orderForm" class="space-y-4">
@@ -1015,20 +1028,85 @@
                 class="w-full border border-gray-300 rounded-md px-3 py-2"
               />
             </div>
-            <div>
+            <!-- 📧 Email Verification Section -->
+            <div id="emailVerification" class="mt-4 space-y-3">
               <label
                 for="customerEmail"
                 class="block text-sm font-medium text-gray-700"
-                >Email</label
               >
-              <input
-                type="email"
-                id="customerEmail"
-                name="customerEmail"
-                required
-                class="w-full border border-gray-300 rounded-md px-3 py-2"
-              />
+                Email Address
+              </label>
+              <div class="flex space-x-2">
+                <input
+                  type="email"
+                  id="customerEmail"
+                  name="customerEmail"
+                  placeholder="Enter your email"
+                  required
+                  class="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                />
+                <button
+                  id="sendCodeBtn"
+                  type="button"
+                  class="px-3 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 focus:outline-none"
+                >
+                  Send Code
+                </button>
+              </div>
+
+              <!-- Verification Code Input -->
+              <div id="verifySection" class="hidden mt-3">
+                <label
+                  for="emailCode"
+                  class="block text-sm font-medium text-gray-700"
+                >
+                  Enter Verification Code
+                </label>
+                <div class="flex space-x-2">
+                  <input
+                    type="text"
+                    id="emailCode"
+                    name="emailCode"
+                    maxlength="6"
+                    placeholder="6-digit code"
+                    class="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  />
+                  <button
+                    id="verifyCodeBtn"
+                    type="button"
+                    class="px-3 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 focus:outline-none"
+                  >
+                    Verify
+                  </button>
+                </div>
+                <p id="emailStatus" class="text-xs text-gray-500 mt-1"></p>
+              </div>
             </div>
+            <div class="mt-4">
+              <label
+                for="customerAddress"
+                class="block text-sm font-medium text-gray-700"
+                >Delivery Address</label
+              >
+              <div class="flex space-x-2 mt-1">
+                <input
+                  id="customerAddress"
+                  name="customerAddress"
+                  type="text"
+                  placeholder="Enter address or use location"
+                  class="flex-grow border rounded-lg px-3 py-2 focus:ring focus:ring-pink-400"
+                />
+                <button
+                  type="button"
+                  id="getLocationBtn"
+                  class="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-3 py-2 rounded-lg hover:from-purple-700 hover:to-pink-700"
+                >
+                  📍 Use My Location
+                </button>
+              </div>
+              <p id="addressValidationMsg" class="text-sm mt-1"></p>
+            </div>
+
             <div>
               <label
                 for="paymentMethod"
@@ -1053,7 +1131,7 @@
               type="submit"
               class="w-full py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full hover:from-purple-700 hover:to-pink-700 transition"
             >
-              Place Order
+              <i class="ri-shopping-cart-line mr-2"></i> Checkout
             </button>
           </form>
         </div>

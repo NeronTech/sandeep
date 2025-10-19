@@ -355,6 +355,11 @@ function stopCamera(videoElement) {
   videoElement.srcObject = null;
 }
 
+function isValidIndianNumber(contact) {
+  const pattern = /^(?:\+91[\-\s]?|91[\-\s]?|0)?[6-9]\d{9}$/;
+  return pattern.test(contact.trim());
+}
+
 // On order form submit
 document.getElementById("orderForm").addEventListener("submit", (e) => {
   e.preventDefault();
@@ -363,12 +368,20 @@ document.getElementById("orderForm").addEventListener("submit", (e) => {
     return;
   }
 
+  const contactInput = document.getElementById("customerContact").value;
+
+  if (!isValidIndianNumber(contactInput)) {
+    showToast("📵 Please enter a valid Indian contact number.", "#dc2626");
+    return;
+  }
+
   const name = e.target.customerName.value.trim();
   const contact = e.target.customerContact.value.trim();
   const email = e.target.customerEmail.value.trim();
+  const address = e.target.customerAddress.value.trim();
   const paymentMethod = e.target.paymentMethod.value;
 
-  if (!name || !contact || !email || !paymentMethod) {
+  if (!name || !contact || !email || !address || !paymentMethod) {
     showToast("Please fill all required fields.");
     return;
   }
@@ -378,6 +391,7 @@ document.getElementById("orderForm").addEventListener("submit", (e) => {
     customerName: name,
     customerContact: contact,
     customerEmail: email,
+    customerAddress: address,
     paymentMethod,
     items: cart,
     total: cart.reduce((sum, i) => sum + i.price * i.quantity, 0),
@@ -387,12 +401,123 @@ document.getElementById("orderForm").addEventListener("submit", (e) => {
     customerName: name,
     customerContact: contact,
     customerEmail: email,
+    customerAddress: address,
     paymentMethod,
   };
 
   submitOrder(order);
   registerUser(user);
 });
+
+const getLocationBtn = document.getElementById("getLocationBtn");
+const addressInput = document.getElementById("customerAddress");
+const addressValidationMsg = document.getElementById("addressValidationMsg");
+
+// 🧭 Get current device location
+getLocationBtn.addEventListener("click", () => {
+  if (!navigator.geolocation) {
+    showToast("⚠️ Geolocation is not supported by your browser");
+    return;
+  }
+
+  showToast("📡 Getting your location...");
+  navigator.geolocation.getCurrentPosition(success, error);
+});
+
+async function success(position) {
+  const { latitude, longitude } = position.coords;
+
+  try {
+    // Use Google Maps Geocoding API (or OpenStreetMap Nominatim if you prefer)
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+    );
+    const data = await res.json();
+
+    addressInput.value = data.display_name || "Detected location";
+    validateServiceArea(latitude, longitude);
+  } catch (err) {
+    showToast("⚠️ Unable to fetch address details.");
+  }
+}
+
+function error() {
+  showToast("❌ Failed to get your location.");
+}
+
+const SERVICE_CENTER = { lat: 19.076, lon: 72.8777 }; // Example: Mumbai center
+const SERVICE_RADIUS_KM = 10;
+
+function validateServiceArea(lat, lon) {
+  const distance = getDistanceFromLatLonInKm(lat, lon, SERVICE_CENTER.lat, SERVICE_CENTER.lon);
+
+  if (distance <= SERVICE_RADIUS_KM) {
+    addressValidationMsg.textContent = "✅ Your location is serviceable for delivery.";
+    addressValidationMsg.className = "text-green-600 text-sm mt-1";
+  } else {
+    addressValidationMsg.textContent = "❌ Sorry, we don’t deliver to your area yet.";
+    addressValidationMsg.className = "text-red-600 text-sm mt-1";
+  }
+}
+
+function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
+  const R = 6371; // Earth radius in km
+  const dLat = deg2rad(lat2 - lat1);
+  const dLon = deg2rad(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
+function deg2rad(deg) {
+  return deg * (Math.PI / 180);
+}
+
+addressInput.addEventListener("blur", async () => {
+  if (addressInput.value.trim().length < 5) return;
+
+  // Convert address → coordinates using Geocoding
+  const query = encodeURIComponent(addressInput.value.trim());
+  const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}`);
+  const data = await res.json();
+
+  if (data.length > 0) {
+    const { lat, lon } = data[0];
+    validateServiceArea(parseFloat(lat), parseFloat(lon));
+  } else {
+    addressValidationMsg.textContent = "⚠️ Unable to locate this address.";
+    addressValidationMsg.className = "text-yellow-600 text-sm mt-1";
+  }
+});
+
+// 1️⃣ Send code
+document.getElementById("sendCodeBtn").onclick = async () => {
+  const email = document.getElementById("customerEmail").value.trim();
+  const res = await sendToGAS({
+    action: "send-code",
+    email
+  });
+  showToaster(res.message);
+};
+
+// 2️⃣ Verify code
+document.getElementById("verifyCodeBtn").onclick = async () => {
+  const email = document.getElementById("customerEmail").value.trim();
+  const code = document.getElementById("emailCode").value.trim();
+  const res = await sendToGAS({
+    action: "verify-code",
+    email,
+    code
+  });
+  showToaster(res.message);
+
+  if (res.success) {
+    document.getElementById("emailSection").classList.add("verified");
+  }
+};
 
 // Register
 async function registerUser(user) {
@@ -564,7 +689,7 @@ document.getElementById("captureLoginBtn").onclick = async () => {
     showMsg(`👋 Welcome back, ${user.name}!`);
 
     // ✅ Auto-fill form fields
-    
+
     // console.log("User Data:", user);
     document.getElementById("customerName").value = user.name || "";
     document.getElementById("customerContact").value = user.contact || "";

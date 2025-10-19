@@ -109,6 +109,20 @@
         transition: opacity 0.6s ease, transform 0.6s ease;
       }
 
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: scale(0.95);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+      .animate-fadeIn {
+        animation: fadeIn 0.2s ease-out;
+      }
+
       .visible {
         opacity: 1;
         transform: translateY(0);
@@ -1177,12 +1191,71 @@
               </div>
             </div>
             <button
-              type="submit"
+              id="placeOrderBtn"
+              type="button"
               class="w-full py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full hover:from-purple-700 hover:to-pink-700 transition"
             >
               <i class="ri-shopping-cart-line mr-2"></i> Checkout
             </button>
           </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- 🧾 Checkout Summary Modal -->
+    <div
+      id="checkoutModal"
+      class="fixed inset-0 hidden bg-black bg-opacity-40 flex items-center justify-center z-50"
+    >
+      <div
+        class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 relative animate-fadeIn"
+      >
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">
+          Confirm Your Order
+        </h2>
+
+        <!-- Summary Details -->
+        <div class="space-y-2 text-sm text-gray-700">
+          <p><strong>Name:</strong> <span id="summaryName"></span></p>
+          <p><strong>Contact:</strong> <span id="summaryContact"></span></p>
+          <p><strong>Email:</strong> <span id="summaryEmail"></span></p>
+          <p><strong>Delivery Address:</strong> <span id="summaryAddress"></span></p>
+          <p>
+            <strong>Payment Method:</strong> <span id="summaryPayment"></span>
+          </p>
+        </div>
+
+        <!-- Divider -->
+        <div class="border-t my-3"></div>
+
+        <!-- Order Items Section (Dynamic Integration) -->
+        <div class="text-sm text-gray-700 border-t pt-3">
+          <strong>Items:</strong>
+          <ul
+            id="summaryItems"
+            class="list-disc list-inside text-gray-600 text-sm"
+          ></ul>
+
+          <p class="mt-2 font-semibold">
+            Total:
+            <span id="summaryTotal" class="text-indigo-600">$0.00</span>
+          </p>
+        </div>
+
+        <!-- Buttons -->
+        <div class="mt-6 flex justify-end space-x-3">
+          <button
+            id="cancelCheckout"
+            class="px-4 py-2 text-gray-600 text-sm font-medium hover:text-gray-800"
+          >
+            Cancel
+          </button>
+          <button
+            id="confirmCheckout"
+            class="px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-lg hover:bg-indigo-700"
+          >
+            Confirm Order
+          </button>
         </div>
       </div>
     </div>

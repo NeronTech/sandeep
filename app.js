@@ -360,6 +360,99 @@ function isValidIndianNumber(contact) {
   return pattern.test(contact.trim());
 }
 
+// --- Live Sync Order Summary ---
+function syncOrderSummary() {
+  const orderItems = document.getElementById("orderItems");
+  const orderTotal = document.getElementById("orderTotal");
+  const summaryItems = document.getElementById("summaryItems");
+  const summaryTotal = document.getElementById("summaryTotal");
+
+  if (!orderItems || !summaryItems) return;
+
+  // Clear old items
+  summaryItems.innerHTML = "";
+
+  // Copy each order item
+  Array.from(orderItems.children).forEach((item) => {
+    const li = document.createElement("li");
+    li.textContent = item.textContent;
+    summaryItems.appendChild(li);
+  });
+
+  // Copy total
+  summaryTotal.textContent = orderTotal ? orderTotal.textContent : "$0.00";
+}
+
+// Observe order changes in real-time
+const orderSection = document.getElementById("orderItems");
+const totalSection = document.getElementById("orderTotal");
+
+// MutationObserver to detect any changes (add/remove items, total updates)
+const observer = new MutationObserver(syncOrderSummary);
+
+// Watch both items and total for updates
+if (orderSection) observer.observe(orderSection, { childList: true, subtree: true });
+if (totalSection) observer.observe(totalSection, { childList: true, characterData: true, subtree: true });
+
+// Initial load
+document.addEventListener("DOMContentLoaded", syncOrderSummary);
+
+const placeOrderBtn = document.getElementById("placeOrderBtn");
+const checkoutModal = document.getElementById("checkoutModal");
+const cancelCheckout = document.getElementById("cancelCheckout");
+const confirmCheckout = document.getElementById("confirmCheckout");
+
+// 🧾 When user clicks "Place Order"
+placeOrderBtn.addEventListener("click", () => {
+  // Gather form values
+  const name = document.getElementById("customerName").value.trim();
+  const contact = document.getElementById("customerContact").value.trim();
+  const email = document.getElementById("customerEmail").value.trim();
+  const address = document.getElementById("customerAddress").value.trim();
+  const payment = document.getElementById("paymentMethod").value;
+
+  // Quick validation
+  if (!name || !contact || !email || !address || !payment) {
+    showToaster("⚠️ Please fill in all required fields", "#dc2626");
+    return;
+  }
+
+  // Fill summary modal
+  document.getElementById("summaryName").textContent = name;
+  document.getElementById("summaryContact").textContent = contact;
+  document.getElementById("summaryEmail").textContent = email;
+  document.getElementById("summaryAddress").textContent = address;
+  document.getElementById("summaryPayment").textContent = payment;
+
+  // (Optional) You can dynamically calculate totals here
+  document.getElementById("summaryTotal").textContent = totalSection.textContent;
+
+  // Show modal
+  checkoutModal.classList.remove("hidden");
+});
+
+// ❌ Cancel button
+cancelCheckout.addEventListener("click", () => {
+  checkoutModal.classList.add("hidden");
+});
+
+// ✅ Confirm button (final submit)
+confirmCheckout.addEventListener("click", async () => {
+  checkoutModal.classList.add("hidden");
+
+  // Optionally: run card validation if needed
+  const payment = document.getElementById("paymentMethod").value;
+  if (payment === "CreditCard") {
+    const valid = await validateCardDetails();
+    if (!valid) return;
+  }
+
+  showToaster("🧾 Submitting your order...", "#2563eb");
+
+  // Submit your form here
+  document.getElementById("orderForm").submit();
+});
+
 // On order form submit
 document.getElementById("orderForm").addEventListener("submit", (e) => {
   e.preventDefault();
@@ -373,6 +466,11 @@ document.getElementById("orderForm").addEventListener("submit", (e) => {
   if (!isValidIndianNumber(contactInput)) {
     showToast("📵 Please enter a valid Indian contact number.", "#dc2626");
     return;
+  }
+
+  if (paymentSelect.value === "card") {
+    const valid = validateCardDetails();
+    if (!valid) return;
   }
 
   const name = e.target.customerName.value.trim();
@@ -518,6 +616,77 @@ document.getElementById("verifyCodeBtn").onclick = async () => {
     document.getElementById("emailSection").classList.add("verified");
   }
 };
+
+const paymentSelect = document.getElementById("paymentMethod");
+const cardSection = document.getElementById("cardSection");
+const cardNumber = document.getElementById("cardNumber");
+const expiryDate = document.getElementById("expiryDate");
+const cvv = document.getElementById("cvv");
+
+// 1️⃣ Show / Hide card section
+paymentSelect.addEventListener("change", () => {
+  console.log("Payment method changed to:", paymentSelect.value);
+  if (paymentSelect.value === "card") {
+    cardSection.classList.remove("hidden");
+  } else {
+    cardSection.classList.add("hidden");
+  }
+});
+
+// 2️⃣ Format card number as XXXX XXXX XXXX XXXX
+cardNumber.addEventListener("input", (e) => {
+  let val = e.target.value.replace(/\D/g, "");
+  val = val.match(/.{1,4}/g)?.join(" ") || "";
+  e.target.value = val;
+});
+
+// 3️⃣ Format expiry as MM/YY
+expiryDate.addEventListener("input", (e) => {
+  let val = e.target.value.replace(/\D/g, "").slice(0, 4);
+  if (val.length >= 3) val = val.slice(0, 2) + "/" + val.slice(2);
+  e.target.value = val;
+});
+
+// 4️⃣ Validate card before form submit
+async function validateCardDetails() {
+  const number = cardNumber.value.replace(/\s/g, "");
+  const expiry = expiryDate.value;
+  const cvvVal = cvv.value;
+
+  if (!luhnCheck(number)) {
+    showToaster("❌ Invalid card number", "#dc2626");
+    return false;
+  }
+
+  if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(expiry)) {
+    showToaster("❌ Invalid expiry date", "#dc2626");
+    return false;
+  }
+
+  if (!/^\d{3}$/.test(cvvVal)) {
+    showToaster("❌ Invalid CVV", "#dc2626");
+    return false;
+  }
+
+  showToaster("✅ Card validated successfully!", "#16a34a");
+  return true;
+}
+
+// 5️⃣ Luhn algorithm to validate card numbers
+function luhnCheck(num) {
+  let arr = (num + "")
+    .split("")
+    .reverse()
+    .map((x) => parseInt(x));
+  let sum = arr.reduce((acc, val, i) => {
+    if (i % 2) {
+      val *= 2;
+      if (val > 9) val -= 9;
+    }
+    return acc + val;
+  }, 0);
+  return sum % 10 === 0;
+}
 
 // Register
 async function registerUser(user) {

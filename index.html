@@ -176,6 +176,72 @@
         justify-content: center;
         z-index: 99999;
       }
+      /* === MENU CONTAINER === */
+      .menu-scroll {
+        display: flex;
+        gap: 1.5rem;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+        padding: 0 5%; /* ensures full visibility of first & last items */
+      }
+
+      .menu-scroll::-webkit-scrollbar {
+        display: none;
+      }
+
+      /* === MENU CARD === */
+      .menu-scroll > div {
+        scroll-snap-align: center;
+        flex: 0 0 14rem; /* desktop width */
+        opacity: 0;
+        transform: translateY(30px);
+        transition: opacity 0.8s ease, transform 0.8s ease;
+      }
+
+      /* Fade-in effect when visible */
+      .menu-scroll > div.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* === RESPONSIVE (Mobile) === */
+      @media (max-width: 768px) {
+        .menu-scroll {
+          padding-inline: 8%;
+        }
+        .menu-scroll > div {
+          flex: 0 0 90%; /* show one card per swipe */
+          max-width: 50%;
+        }
+        .left-arrow,
+        .right-arrow {
+          display: none; /* hide arrows on mobile */
+        }
+      }
+
+      /* === ARROWS === */
+      .left-arrow,
+      .right-arrow {
+        z-index: 10;
+        background-color: rgba(31, 41, 55, 0.85);
+        color: white;
+        border-radius: 9999px;
+        padding: 0.45rem;
+        transition: opacity 0.3s ease;
+      }
+
+      @media (min-width: 769px) {
+        .left-arrow,
+        .right-arrow {
+          opacity: 0;
+        }
+        .group:hover .left-arrow,
+        .group:hover .right-arrow {
+          opacity: 1;
+        }
+      }
     </style>
   </head>
   <body class="bg-gradient-to-b from-white to-gray-50 font-sans">
@@ -654,10 +720,7 @@
       >
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 class="text-3xl font-bold mb-8 text-center">Our Menu</h2>
-          <div
-            id="menuItems"
-            class="grid grid-cols-1 md:grid-cols-4 gap-8"
-          ></div>
+          <div id="menuItems"></div>
         </div>
       </section>
 
@@ -1219,7 +1282,9 @@
           <p><strong>Name:</strong> <span id="summaryName"></span></p>
           <p><strong>Contact:</strong> <span id="summaryContact"></span></p>
           <p><strong>Email:</strong> <span id="summaryEmail"></span></p>
-          <p><strong>Delivery Address:</strong> <span id="summaryAddress"></span></p>
+          <p>
+            <strong>Delivery Address:</strong> <span id="summaryAddress"></span>
+          </p>
           <p>
             <strong>Payment Method:</strong> <span id="summaryPayment"></span>
           </p>

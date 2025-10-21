@@ -1,8 +1,9 @@
 const GAS_URL =
-  "https://script.google.com/macros/s/AKfycbz9gbq_mUdbFUepid_YMTeiJfCIQgrpHyUmxHn-WsJH3RvmNj23sHePscnwACFJ8OWb/exec"; //fl-success
+  "https://script.google.com/macros/s/AKfycbzLlbwEVAoACWPOaOTl6ZqAZAxXYAtE2mVtP3PSrYDp8ii0bBzyrq02QyDsaoSPa1RF/exec"; //ml2
 // Make sure this is your latest public deployment URL
 
 document.addEventListener("DOMContentLoaded", loadMenu);
+
 const menuContainer = document.getElementById("menuItems");
 
 // ======= OPEN ORDER MODAL BUTTONS =======
@@ -132,7 +133,7 @@ async function loadMenu() {
   try {
     const res = await fetch(GAS_URL);
     const data = await res.json();
-    renderMenu(data.menu); // Pass array, not string
+    renderMenu(data); // Pass array, not string
   } catch (err) {
     if (menuContainer)
       menuContainer.innerHTML =
@@ -140,51 +141,148 @@ async function loadMenu() {
   }
 }
 
-function renderMenu(items) {
+// === RENDER MENU ===
+function renderMenu(data) {
   const menuContainer = document.getElementById("menuItems");
   if (!menuContainer) return;
+  menuContainer.innerHTML = "";
 
-  if (!items || items.length === 0) {
-    menuContainer.innerHTML =
-      '<p class="text-center text-gray-500 col-span-full">No menu items found.</p>';
-    return;
-  }
+  const categories = Array.isArray(data[0]?.items)
+    ? data
+    : [{ name: "Menu", items: data }];
 
-  menuContainer.innerHTML = ""; // Clear previous
+  categories.forEach((category) => {
+    const categoryDiv = document.createElement("div");
+    categoryDiv.className = "w-full text-center mb-12";
 
-  items.forEach((item) => {
-    const card = document.createElement("div");
-    card.className =
-      "bg-white rounded-xl shadow-lg overflow-hidden flex flex-col transform transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 hover:scale-[1.03] hover:ring-2 hover:ring-offset-2 hover:ring-pink-400";
-    card.innerHTML = `
-        <img src="${item.imageUrl}" alt="${item.name
-      }" class="h-50 w-full object-cover" />
-        <div class="p-4 flex flex-col flex-grow">
-          <h3 class="font-semibold text-xl mb-1">${item.name}</h3>
-          <p class="text-gray-600 flex-grow">${item.descriptio}</p>
-          <div class="mt-4 flex items-center justify-between">
-            <span class="font-bold text-lg">$${parseFloat(item.price).toFixed(
-        2
-      )}</span>
-            <button class="add-to-cart-btn bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-2 rounded-full hover:from-purple-700 hover:to-pink-700 transition" data-name="${item.name
-      }" data-price="${item.price}">
-              Add to Cart
-            </button>
-          </div>
-        </div>
-      `;
-    menuContainer.appendChild(card);
+    const title = document.createElement("p");
+    title.className = "text-2xl font-semibold mb-4 text-gray-800";
+    title.textContent = category.name;
+
+    const wrapper = document.createElement("div");
+    wrapper.className = "relative flex items-center justify-center group";
+
+    const safeId = category.name.replace(/\s+/g, "-").toLowerCase();
+
+    wrapper.innerHTML = `
+      <button class="left-arrow absolute left-2 top-1/2 -translate-y-1/2">&#8592;</button>
+
+      <div id="menu-${safeId}" class="menu-scroll no-scrollbar">
+        ${category.items
+        .map(
+          (item) => `
+          <div class="bg-white rounded-xl shadow-md overflow-hidden flex flex-col 
+                      hover:shadow-lg transform hover:-translate-y-1 transition snap-center">
+            <img src="${item.imageUrl || "https://via.placeholder.com/400x300"}"
+                 alt="${item.name}"
+                 class="h-40 w-full object-cover" />
+            <div class="p-4 flex flex-col flex-grow">
+              <h3 class="font-semibold text-lg mb-1">${item.name}</h3>
+              <p class="text-gray-600 text-sm flex-grow">${item.description || ""}</p>
+              <div class="mt-3 flex items-center justify-between">
+                <span class="font-bold text-indigo-600">$${parseFloat(item.price).toFixed(2)}</span>
+                <button class="add-to-cart-btn bg-gradient-to-r from-purple-600 to-pink-600 text-white px-3 py-1 rounded-full text-xs"
+                        data-name="${item.name}"
+                        data-price="${item.price}">
+                  Add
+                </button>
+              </div>
+            </div>
+          </div>`
+        )
+        .join("")}
+      </div>
+
+      <button class="right-arrow absolute right-2 top-1/2 -translate-y-1/2">&#8594;</button>
+    `;
+
+    categoryDiv.appendChild(title);
+    categoryDiv.appendChild(wrapper);
+    menuContainer.appendChild(categoryDiv);
+
+    const scrollContainer = wrapper.querySelector(`#menu-${safeId}`);
+    const leftArrow = wrapper.querySelector(".left-arrow");
+    const rightArrow = wrapper.querySelector(".right-arrow");
+
+    // Scroll logic
+    leftArrow.addEventListener("click", () => {
+      scrollContainer.scrollBy({ left: -scrollContainer.clientWidth * 0.6, behavior: "smooth" });
+    });
+    rightArrow.addEventListener("click", () => {
+      scrollContainer.scrollBy({ left: scrollContainer.clientWidth * 0.6, behavior: "smooth" });
+    });
+
+    // Center items if ≤4 (even 1 item)
+    if (category.items.length <= 4) {
+      leftArrow.classList.add("hidden");
+      rightArrow.classList.add("hidden");
+      scrollContainer.style.justifyContent = "center";
+    }
   });
 
-  // Add event listeners to buttons
+  // === Add to Cart Buttons ===
   document.querySelectorAll(".add-to-cart-btn").forEach((btn) => {
     btn.addEventListener("click", (e) => {
-      const name = btn.getAttribute("data-name");
-      const price = parseFloat(btn.getAttribute("data-price"));
-      addToCart(name, price);
+      const { name, price } = e.target.dataset;
+      addToCart(name, parseFloat(price), e.target);
     });
   });
+
+  // === Fade-in Animation (on scroll) ===
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible");
+          observer.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.2 }
+  );
+
+  document.querySelectorAll(".menu-scroll > div").forEach((el) => observer.observe(el));
 }
+
+
+// function renderMenu(items) {
+//   // console.log("Menu Items:", items);
+//   const menuContainer = document.getElementById("menuItems");
+//   if (!menuContainer) return;
+
+//   if (!items || items.length === 0) {
+//     menuContainer.innerHTML =
+//       '<p class="text-center text-gray-500 col-span-full">No menu items found.</p>';
+//     return;
+//   }
+
+//   menuContainer.innerHTML = ""; // Clear previous
+
+//   items.forEach((item) => {
+//     const card = document.createElement("div");
+//     card.className =
+//       "bg-white rounded-xl shadow-lg overflow-hidden flex flex-col transform transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 hover:scale-[1.03] hover:ring-2 hover:ring-offset-2 hover:ring-pink-400";
+//     card.innerHTML = `
+//         <img src="${item.imageUrl}" alt="${item.name
+//       }" class="h-50 w-full object-cover" />
+//         <div class="p-4 flex flex-col flex-grow">
+//           <h3 class="font-semibold text-xl mb-1">${item.name}</h3>
+//           <p class="text-gray-600 flex-grow">${item.description}</p>
+//           <div class="mt-4 flex items-center justify-between">
+//             <span class="font-bold text-lg">$${parseFloat(item.price).toFixed(
+//         2
+//       )}</span>
+//             <button class="add-to-cart-btn bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-2 rounded-full hover:from-purple-700 hover:to-pink-700 transition" data-name="${item.name
+//       }" data-price="${item.price}">
+//               Add to Cart
+//             </button>
+//           </div>
+//         </div>
+//       `;
+//     menuContainer.appendChild(card);
+//   });
+// }
+
 
 function addToCart(name, price) {
   const existing = cart.find((i) => i.name === name);

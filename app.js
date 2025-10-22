@@ -2,39 +2,32 @@ const GAS_URL =
   "https://script.google.com/macros/s/AKfycbzLlbwEVAoACWPOaOTl6ZqAZAxXYAtE2mVtP3PSrYDp8ii0bBzyrq02QyDsaoSPa1RF/exec"; //ml2
 // Make sure this is your latest public deployment URL
 
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker
-    .register("/service-worker.js")
-    .then(() => console.log("✅ Service Worker Registered"))
-    .catch((err) => console.error("SW registration failed:", err));
-}
-
 document.addEventListener("DOMContentLoaded", loadMenu);
 
 document.addEventListener("DOMContentLoaded", () => {
   let deferredPrompt;
-  const installBanner = document.getElementById('installBanner');
-  const installBtn = document.getElementById('installBtn');
-  const closeBanner = document.getElementById('closeBanner');
+  const installBtn = document.getElementById("installBtn");
+  // const closeBanner = document.getElementById("closeBanner");
 
-  window.addEventListener('beforeinstallprompt', (e) => {
+  window.addEventListener("beforeinstallprompt", (e) => {
+    console.log("👍 beforeinstallprompt fired");
     e.preventDefault();
     deferredPrompt = e;
-    installBanner.classList.remove('hidden');
+    installBtn.classList.remove("hidden");
   });
 
-  installBtn.addEventListener('click', async () => {
+  installBtn.addEventListener("click", async () => {
     if (!deferredPrompt) return;
     deferredPrompt.prompt();
     const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === 'accepted') console.log('App installed');
+    console.log(`User response: ${outcome}`);
     deferredPrompt = null;
-    installBanner.classList.add('hidden');
+    installBtn.classList.add("hidden");
   });
 
-  closeBanner.addEventListener('click', () => {
-    installBanner.classList.add('hidden');
-  });
+  // closeBanner.addEventListener("click", () => {
+  //   installBanner.classList.add("hidden");
+  // });
 });
 
 const menuContainer = document.getElementById("menuItems");

@@ -42,58 +42,16 @@
         -moz-osx-font-smoothing: grayscale;
       }
 
-      .install-banner {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        background: #0d6efd;
-        color: white;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
-        animation: slideUp 0.4s ease-out;
-        z-index: 9999;
+      #installBtn {
+        animation: fadeSlideUp 0.6s ease forwards;
       }
-
-      .install-banner.hidden {
-        display: none;
-      }
-
-      .install-banner-content {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        width: 90%;
-        max-width: 500px;
-        padding: 12px 16px;
-        gap: 12px;
-      }
-
-      .install-btn {
-        background: white;
-        color: #0d6efd;
-        border: none;
-        padding: 8px 14px;
-        border-radius: 6px;
-        cursor: pointer;
-        font-weight: 600;
-      }
-
-      .close-btn {
-        background: transparent;
-        color: white;
-        border: none;
-        font-size: 20px;
-        cursor: pointer;
-      }
-
-      @keyframes slideUp {
+      @keyframes fadeSlideUp {
         from {
-          transform: translateY(100%);
+          opacity: 0;
+          transform: translateY(15px);
         }
         to {
+          opacity: 1;
           transform: translateY(0);
         }
       }
@@ -1410,19 +1368,24 @@
       </div>
     </footer>
 
-    <!-- Install App Banner -->
-    <div id="installBanner" class="install-banner hidden">
-      <div class="install-banner-content">
-        <div>
-          <strong>Install this app</strong><br />
-          Add it to your home screen for quick access!
-        </div>
-        <div class="install-banner-actions">
-          <button id="installBtn" class="install-btn">Install</button>
-          <button id="closeBanner" class="close-btn">×</button>
-        </div>
-      </div>
+    <!-- Floating PWA Install Button -->
+    <div class="fixed bottom-6 right-6 z-50">
+      <button
+        id="installBtn"
+        class="hidden bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold px-5 py-3 rounded-full shadow-lg hover:from-purple-700 hover:to-pink-700 transition transform hover:scale-105"
+      >
+        📱 Download App Now
+      </button>
     </div>
+
+    <script>
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker
+          .register("/service-worker.js")
+          .then(() => console.log("✅ Service Worker Registered"))
+          .catch((err) => console.error("SW registration failed:", err));
+      }
+    </script>
 
     <script src="app.js"></script>
   </body>

@@ -8,33 +8,56 @@ if ("serviceWorker" in navigator) {
 
 document.addEventListener("DOMContentLoaded", loadMenu);
 
-let deferredPrompt;
-const installBtn = document.getElementById("pwaInstallBtn");
-const manualPopup = document.getElementById("pwaManualInstall");
-const closeGuide = document.getElementById("closePwaGuide");
-const toastContainer = document.getElementById("toastContainer");
+let deferredPrompt = null;
 
-// === Detect iOS or In-App Browsers ===
-function isInAppBrowser() {
-  const ua = navigator.userAgent.toLowerCase();
-  return (
-    ua.includes("fbav") ||
-    ua.includes("instagram") ||
-    ua.includes("line") ||
-    ua.includes("tiktok")
-  );
+// === Listen for the install prompt ===
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e; // Store the event for later use
+  console.log("✅ PWA install prompt captured.");
+});
+
+// === Toast Function ===
+function showToast(message, bg = "#333") {
+  const toastContainer = document.getElementById("toastPWAContainer");
+  const toast = document.createElement("div");
+  toast.className = "toast";
+  toast.style.background = bg;
+  toast.textContent = message;
+  toastContainer.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
 }
 
-function isIos() {
-  return /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
-}
+// === Install Button ===
+document.getElementById("installAppBtn").addEventListener("click", async () => {
+  if (deferredPrompt) {
+    // Show install prompt instantly
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+      showToast("🎉 App installed successfully!", "#16a34a");
+    } else {
+      showToast("ℹ️ Installation cancelled.", "#dc2626");
+    }
+    deferredPrompt = null;
+  } else {
+    // Fallback for unsupported browsers (Messenger, Safari, etc.)
+    const ua = navigator.userAgent.toLowerCase();
+    if (/iphone|ipad|ipod/.test(ua)) {
+      showToast("📱 Tap ‘Share’ → ‘Add to Home Screen’ to install.", "#2563eb");
+    } else if (ua.includes("fbav") || ua.includes("instagram") || ua.includes("messenger")) {
+      showToast("⚠️ Open in Chrome or Safari to install this app.", "#f59e0b");
+    } else {
+      showToast("ℹ️ App installation not supported on this browser.", "#dc2626");
+    }
+  }
+});
 
-function isInStandaloneMode() {
-  return (
-    window.matchMedia("(display-mode: standalone)").matches ||
-    window.navigator.standalone === true
-  );
-}
+// === Detect successful install (some browsers fire this event) ===
+window.addEventListener('appinstalled', () => {
+  showToast("🎉 App added to your home screen!", "#16a34a");
+  deferredPrompt = null;
+});
 
 // === Toast Utility ===
 function showToast(message, duration = 3000) {

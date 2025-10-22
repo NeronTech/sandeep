@@ -289,7 +289,7 @@
               <span
                 class="text-xl font-bold text-gray-900 leading-tight"
                 style="font-family: Pacifico, serif"
-                >Smoothies &amp; Snacks</span
+                >Smoothies &amp; More</span
               >
               <span class="text-xs text-gray-600 font-medium -mt-1"
                 >Home of Delicious Smoothies &amp; Snacks</span
@@ -334,13 +334,12 @@
           </div>
           <button
             id="cartBtnMobile"
-            class="md:hidden w-full inline-flex items-center justify-center border-2 border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white px-4 py-2 rounded-full text-sm transition"
+            class="md:hidden inline-flex items-center justify-center border-2 border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white px-3 py-2 rounded-full text-sm transition mx-auto"
           >
-            <i class="ri-shopping-cart-line mr-2"></i> Cart (<span
-              id="cartCountMobile"
-              >0</span
-            >)
+            <i class="ri-shopping-cart-line mr-1"></i>
+            Cart (<span id="cartCountMobile">0</span>)
           </button>
+
           <button
             id="mobile-menu-button"
             class="md:hidden p-2"
@@ -936,7 +935,7 @@
               </h3>
               <div class="space-y-2 text-center md:text-left">
                 <p class="text-lg font-semibold text-gray-800">
-                  Sandeeps Smoothies & Snacks
+                  Smoothies & More
                 </p>
                 <p class="text-gray-600">
                   123 Flavor Street, Foodie City, FC 12345
@@ -1421,6 +1420,15 @@
         </button>
       </div>
     </div>
+
+    <script>
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker
+          .register("/service-worker.js")
+          .then(() => console.log("✅ Service Worker Registered"))
+          .catch((err) => console.error("SW registration failed:", err));
+      }
+    </script>
 
     <script src="app.js"></script>
   </body>

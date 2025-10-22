@@ -8,121 +8,23 @@ if ("serviceWorker" in navigator) {
 
 document.addEventListener("DOMContentLoaded", loadMenu);
 
-let deferredPrompt = null;
+let deferredPrompt;
+const installBtn = document.getElementById('pwaInstallBtn');
 
-// === Listen for the install prompt ===
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
-  deferredPrompt = e; // Store the event for later use
-  console.log("✅ PWA install prompt captured.");
-});
-
-// === Toast Function ===
-function showToast(message, bg = "#333") {
-  const toastContainer = document.getElementById("toastPWAContainer");
-  const toast = document.createElement("div");
-  toast.className = "toast";
-  toast.style.background = bg;
-  toast.textContent = message;
-  toastContainer.appendChild(toast);
-  setTimeout(() => toast.remove(), 3000);
-}
-
-// === Install Button ===
-document.getElementById("installAppBtn").addEventListener("click", async () => {
-  if (deferredPrompt) {
-    // Show install prompt instantly
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === 'accepted') {
-      showToast("🎉 App installed successfully!", "#16a34a");
-    } else {
-      showToast("ℹ️ Installation cancelled.", "#dc2626");
-    }
-    deferredPrompt = null;
-  } else {
-    // Fallback for unsupported browsers (Messenger, Safari, etc.)
-    const ua = navigator.userAgent.toLowerCase();
-    if (/iphone|ipad|ipod/.test(ua)) {
-      showToast("📱 Tap ‘Share’ → ‘Add to Home Screen’ to install.", "#2563eb");
-    } else if (ua.includes("fbav") || ua.includes("instagram") || ua.includes("messenger")) {
-      showToast("⚠️ Open in Chrome or Safari to install this app.", "#f59e0b");
-    } else {
-      showToast("ℹ️ App installation not supported on this browser.", "#dc2626");
-    }
-  }
-});
-
-// === Detect successful install (some browsers fire this event) ===
-window.addEventListener('appinstalled', () => {
-  showToast("🎉 App added to your home screen!", "#16a34a");
-  deferredPrompt = null;
-});
-
-// === Toast Utility ===
-function showToast(message, duration = 3000) {
-  const toast = document.createElement("div");
-  toast.className =
-    "bg-gray-900 text-white text-sm font-medium px-4 py-2 rounded-full shadow-lg opacity-0 translate-y-3 transition-all duration-500";
-  toast.textContent = message;
-  toastContainer.appendChild(toast);
-
-  // Fade in
-  setTimeout(() => {
-    toast.classList.add("opacity-100", "translate-y-0");
-  }, 100);
-
-  // Fade out
-  setTimeout(() => {
-    toast.classList.remove("opacity-100");
-    toast.classList.add("opacity-0", "translate-y-3");
-    setTimeout(() => toast.remove(), 500);
-  }, duration);
-}
-
-// === Handle beforeinstallprompt (Android/desktop) ===
-window.addEventListener("beforeinstallprompt", (e) => {
-  e.preventDefault();
   deferredPrompt = e;
-  installBtn.classList.remove("hidden");
-  showToast("✨ Smoothies & More App is ready to install!");
+  installBtn.hidden = false;
 });
 
-// === Install button click ===
-installBtn.addEventListener("click", async () => {
-  if (deferredPrompt) {
-    deferredPrompt.prompt();
-    const choice = await deferredPrompt.userChoice;
-    if (choice.outcome === "accepted") {
-      showToast("✅ Installing Smoothies & More App...");
-    } else {
-      showToast("ℹ️ Install canceled.");
-    }
-    deferredPrompt = null;
-    installBtn.classList.add("hidden");
-  } else if (isIos() || isInAppBrowser()) {
-    manualPopup.classList.remove("hidden");
-  } else {
-    showToast("ℹ️ Use browser menu → 'Add to Home Screen'.");
+installBtn.addEventListener('click', async () => {
+  installBtn.hidden = true;
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  if (outcome === 'accepted') {
+    console.log('App installed');
   }
-});
-
-// === Manual Popup Close ===
-closeGuide.addEventListener("click", () => {
-  manualPopup.classList.add("hidden");
-});
-
-// === Hide install button if already installed ===
-window.addEventListener("appinstalled", () => {
-  installBtn.classList.add("hidden");
-  showToast("🎉 Smoothies & More App installed successfully!");
-});
-
-// === Show button on load if not installed ===
-window.addEventListener("load", () => {
-  if (!isInStandaloneMode()) {
-    installBtn.classList.remove("hidden");
-  }
+  deferredPrompt = null;
 });
 
 const menuContainer = document.getElementById("menuItems");

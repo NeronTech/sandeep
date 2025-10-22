@@ -42,35 +42,23 @@
         -moz-osx-font-smoothing: grayscale;
       }
 
-      @keyframes fadeSlideUp {
-        from {
-          opacity: 0;
-          transform: translateY(15px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-
-      .animate-fadeSlideUp {
-        animation: fadeSlideUp 0.6s ease forwards;
-      }
-
-      #toastInstall.show {
-        opacity: 1;
-        animation: fadeInOut 3s ease;
-      }
-
       @keyframes fadeInOut {
-        0%,
-        100% {
+        0% {
           opacity: 0;
+          transform: translate(-50%, 20px);
         }
         10%,
         90% {
           opacity: 1;
+          transform: translate(-50%, 0);
         }
+        100% {
+          opacity: 0;
+          transform: translate(-50%, -20px);
+        }
+      }
+      .animate-fadeInOut {
+        animation: fadeInOut 3s ease forwards;
       }
       /* Make header fixed to top and full width */
       .site-header {
@@ -1389,18 +1377,10 @@
     <div class="fixed bottom-6 right-6 z-50">
       <button
         id="installBtn"
-        class="hidden bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold px-5 py-3 rounded-full shadow-lg hover:from-purple-700 hover:to-pink-700 transition transform hover:scale-105 animate-fadeSlideUp"
+        class="hidden bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold px-5 py-3 rounded-full shadow-lg hover:from-purple-700 hover:to-pink-700 transition transform hover:scale-105"
       >
         📱 Download App Now
       </button>
-    </div>
-
-    <!-- Toast -->
-    <div
-      id="toastInstall"
-      class="hidden fixed bottom-20 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white px-4 py-2 rounded-full text-sm shadow-lg opacity-0 transition-opacity duration-500 z-[99999]"
-    >
-      Open in Chrome or Safari to install
     </div>
 
     <script>

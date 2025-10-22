@@ -7,53 +7,56 @@ document.addEventListener("DOMContentLoaded", loadMenu);
 document.addEventListener("DOMContentLoaded", () => {
   let deferredPrompt;
   const installBtn = document.getElementById("installBtn");
-  const toast = document.getElementById("toastInstall");
+  let shownManually = false;
 
-  // Detect if PWA is already installed
-  if (window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone) {
-    installBtn.classList.add("hidden");
-    return;
-  }
-
-  // Detect Messenger or in-app browsers
-  const ua = navigator.userAgent.toLowerCase();
-  const isInAppBrowser = ua.includes("fbav") || ua.includes("instagram") || ua.includes("tiktok");
-
-  // Handle non-supported browsers
-  if (isInAppBrowser) {
-    installBtn.classList.remove("hidden");
-    installBtn.addEventListener("click", () => {
-      toast.classList.remove("hidden");
-      toast.classList.add("show");
-      setTimeout(() => toast.classList.add("hidden"), 3000);
-    });
-    return;
-  }
-
-  // Handle supported browsers (Chrome, Edge, etc.)
+  // --- Listen for real Chrome install event ---
   window.addEventListener("beforeinstallprompt", (e) => {
+    console.log("🎯 beforeinstallprompt event fired");
     e.preventDefault();
     deferredPrompt = e;
     installBtn.classList.remove("hidden");
   });
 
+  // --- Always show button after 3 seconds if not shown yet ---
+  setTimeout(() => {
+    if (installBtn.classList.contains("hidden")) {
+      installBtn.classList.remove("hidden");
+      shownManually = true;
+    }
+  }, 3000);
+
+  // --- Button click handler ---
   installBtn.addEventListener("click", async () => {
-    if (!deferredPrompt) {
-      toast.classList.remove("hidden");
-      toast.classList.add("show");
-      setTimeout(() => toast.classList.add("hidden"), 3000);
-      return;
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      console.log(`User response: ${outcome}`);
+      if (outcome === "accepted") {
+        showToast("✅ App is installing...");
+      } else {
+        showToast("ℹ️ Install canceled");
+      }
+      deferredPrompt = null;
+    } else if (shownManually) {
+      showToast("ℹ️ To install: Tap ⋮ → Add to Home Screen");
     }
-
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    console.log(`User response: ${outcome}`);
-    deferredPrompt = null;
-
-    if (outcome === "accepted") {
-      installBtn.classList.add("hidden");
-    }
+    installBtn.classList.add("hidden");
   });
+
+  window.addEventListener("appinstalled", () => {
+    console.log("🎉 App installed successfully!");
+    showToast("🎉 App installed successfully!");
+  });
+
+  // --- Toast function ---
+  function showToast(msg) {
+    const toast = document.createElement("div");
+    toast.textContent = msg;
+    toast.className =
+      "fixed bottom-20 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white px-4 py-2 rounded-full shadow-lg text-sm animate-fadeInOut";
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3500);
+  }
 });
 
 

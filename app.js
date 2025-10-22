@@ -7,28 +7,55 @@ document.addEventListener("DOMContentLoaded", loadMenu);
 document.addEventListener("DOMContentLoaded", () => {
   let deferredPrompt;
   const installBtn = document.getElementById("installBtn");
-  // const closeBanner = document.getElementById("closeBanner");
+  const toast = document.getElementById("toastInstall");
 
+  // Detect if PWA is already installed
+  if (window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone) {
+    installBtn.classList.add("hidden");
+    return;
+  }
+
+  // Detect Messenger or in-app browsers
+  const ua = navigator.userAgent.toLowerCase();
+  const isInAppBrowser = ua.includes("fbav") || ua.includes("instagram") || ua.includes("tiktok");
+
+  // Handle non-supported browsers
+  if (isInAppBrowser) {
+    installBtn.classList.remove("hidden");
+    installBtn.addEventListener("click", () => {
+      toast.classList.remove("hidden");
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.add("hidden"), 3000);
+    });
+    return;
+  }
+
+  // Handle supported browsers (Chrome, Edge, etc.)
   window.addEventListener("beforeinstallprompt", (e) => {
-    console.log("👍 beforeinstallprompt fired");
     e.preventDefault();
     deferredPrompt = e;
     installBtn.classList.remove("hidden");
   });
 
   installBtn.addEventListener("click", async () => {
-    if (!deferredPrompt) return;
+    if (!deferredPrompt) {
+      toast.classList.remove("hidden");
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.add("hidden"), 3000);
+      return;
+    }
+
     deferredPrompt.prompt();
     const { outcome } = await deferredPrompt.userChoice;
     console.log(`User response: ${outcome}`);
     deferredPrompt = null;
-    installBtn.classList.add("hidden");
-  });
 
-  // closeBanner.addEventListener("click", () => {
-  //   installBanner.classList.add("hidden");
-  // });
+    if (outcome === "accepted") {
+      installBtn.classList.add("hidden");
+    }
+  });
 });
+
 
 const menuContainer = document.getElementById("menuItems");
 

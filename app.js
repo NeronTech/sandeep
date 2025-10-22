@@ -2,7 +2,105 @@ const GAS_URL =
   "https://script.google.com/macros/s/AKfycbzLlbwEVAoACWPOaOTl6ZqAZAxXYAtE2mVtP3PSrYDp8ii0bBzyrq02QyDsaoSPa1RF/exec"; //ml2
 // Make sure this is your latest public deployment URL
 
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("/service-worker.js");
+}
+
 document.addEventListener("DOMContentLoaded", loadMenu);
+
+let deferredPrompt;
+const installBtn = document.getElementById("pwaInstallBtn");
+const manualPopup = document.getElementById("pwaManualInstall");
+const closeGuide = document.getElementById("closePwaGuide");
+const toastContainer = document.getElementById("toastContainer");
+
+// === Detect iOS or In-App Browsers ===
+function isInAppBrowser() {
+  const ua = navigator.userAgent.toLowerCase();
+  return (
+    ua.includes("fbav") ||
+    ua.includes("instagram") ||
+    ua.includes("line") ||
+    ua.includes("tiktok")
+  );
+}
+
+function isIos() {
+  return /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
+}
+
+function isInStandaloneMode() {
+  return (
+    window.matchMedia("(display-mode: standalone)").matches ||
+    window.navigator.standalone === true
+  );
+}
+
+// === Toast Utility ===
+function showToast(message, duration = 3000) {
+  const toast = document.createElement("div");
+  toast.className =
+    "bg-gray-900 text-white text-sm font-medium px-4 py-2 rounded-full shadow-lg opacity-0 translate-y-3 transition-all duration-500";
+  toast.textContent = message;
+  toastContainer.appendChild(toast);
+
+  // Fade in
+  setTimeout(() => {
+    toast.classList.add("opacity-100", "translate-y-0");
+  }, 100);
+
+  // Fade out
+  setTimeout(() => {
+    toast.classList.remove("opacity-100");
+    toast.classList.add("opacity-0", "translate-y-3");
+    setTimeout(() => toast.remove(), 500);
+  }, duration);
+}
+
+// === Handle beforeinstallprompt (Android/desktop) ===
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  installBtn.classList.remove("hidden");
+  showToast("✨ Smoothies & More App is ready to install!");
+});
+
+// === Install button click ===
+installBtn.addEventListener("click", async () => {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    const choice = await deferredPrompt.userChoice;
+    if (choice.outcome === "accepted") {
+      showToast("✅ Installing Smoothies & More App...");
+    } else {
+      showToast("ℹ️ Install canceled.");
+    }
+    deferredPrompt = null;
+    installBtn.classList.add("hidden");
+  } else if (isIos() || isInAppBrowser()) {
+    manualPopup.classList.remove("hidden");
+  } else {
+    showToast("ℹ️ Use browser menu → 'Add to Home Screen'.");
+  }
+});
+
+// === Manual Popup Close ===
+closeGuide.addEventListener("click", () => {
+  manualPopup.classList.add("hidden");
+});
+
+// === Hide install button if already installed ===
+window.addEventListener("appinstalled", () => {
+  installBtn.classList.add("hidden");
+  showToast("🎉 Smoothies & More App installed successfully!");
+});
+
+// === Show button on load if not installed ===
+window.addEventListener("load", () => {
+  if (!isInStandaloneMode()) {
+    installBtn.classList.remove("hidden");
+  }
+});
 
 const menuContainer = document.getElementById("menuItems");
 

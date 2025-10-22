@@ -3,28 +3,38 @@ const GAS_URL =
 // Make sure this is your latest public deployment URL
 
 if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("/service-worker.js");
+  navigator.serviceWorker
+    .register("/service-worker.js")
+    .then(() => console.log("✅ Service Worker Registered"))
+    .catch((err) => console.error("SW registration failed:", err));
 }
 
 document.addEventListener("DOMContentLoaded", loadMenu);
 
-let deferredPrompt;
-const installBtn = document.getElementById('pwaInstallBtn');
+document.addEventListener("DOMContentLoaded", () => {
+  let deferredPrompt;
+  const installBanner = document.getElementById('installBanner');
+  const installBtn = document.getElementById('installBtn');
+  const closeBanner = document.getElementById('closeBanner');
 
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-  installBtn.hidden = false;
-});
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    installBanner.classList.remove('hidden');
+  });
 
-installBtn.addEventListener('click', async () => {
-  installBtn.hidden = true;
-  deferredPrompt.prompt();
-  const { outcome } = await deferredPrompt.userChoice;
-  if (outcome === 'accepted') {
-    console.log('App installed');
-  }
-  deferredPrompt = null;
+  installBtn.addEventListener('click', async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') console.log('App installed');
+    deferredPrompt = null;
+    installBanner.classList.add('hidden');
+  });
+
+  closeBanner.addEventListener('click', () => {
+    installBanner.classList.add('hidden');
+  });
 });
 
 const menuContainer = document.getElementById("menuItems");

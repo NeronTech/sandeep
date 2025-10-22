@@ -42,32 +42,61 @@
         -moz-osx-font-smoothing: grayscale;
       }
 
-      #toastPWAContainer {
+      .install-banner {
         position: fixed;
-        bottom: 1.5rem;
-        left: 50%;
-        transform: translateX(-50%);
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background: #0d6efd;
+        color: white;
         display: flex;
-        flex-direction: column;
+        justify-content: center;
         align-items: center;
-        gap: 0.5rem;
-        z-index: 99999;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+        animation: slideUp 0.4s ease-out;
+        z-index: 9999;
       }
 
-      #pwaInstallBtn {
-        animation: fadeSlideUp 0.6s ease forwards;
+      .install-banner.hidden {
+        display: none;
       }
-      @keyframes fadeSlideUp {
+
+      .install-banner-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 90%;
+        max-width: 500px;
+        padding: 12px 16px;
+        gap: 12px;
+      }
+
+      .install-btn {
+        background: white;
+        color: #0d6efd;
+        border: none;
+        padding: 8px 14px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+      }
+
+      .close-btn {
+        background: transparent;
+        color: white;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+      }
+
+      @keyframes slideUp {
         from {
-          opacity: 0;
-          transform: translateY(15px);
+          transform: translateY(100%);
         }
         to {
-          opacity: 1;
           transform: translateY(0);
         }
       }
-
       /* Make header fixed to top and full width */
       .site-header {
         position: fixed;
@@ -1381,54 +1410,19 @@
       </div>
     </footer>
 
-    <!-- Toast Notification -->
-    <div id="toastPWAContainer"></div>
-
-    <!-- Floating PWA Install Button -->
-    <div class="fixed bottom-6 right-6 z-50">
-      <button
-        id="pwaInstallBtn"
-        class="hidden bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold px-5 py-3 rounded-full shadow-lg hover:from-purple-700 hover:to-pink-700 transition transform hover:scale-105"
-      >
-        📱 Download App Now
-      </button>
-    </div>
-
-    <!-- Manual PWA Install Popup -->
-    <div
-      id="pwaManualInstall"
-      class="fixed inset-0 bg-black/70 flex items-center justify-center hidden z-[9999]"
-    >
-      <div class="bg-white rounded-2xl shadow-xl p-6 text-center max-w-sm mx-4">
-        <img
-          src="/icons/icon-192.png"
-          alt="App Icon"
-          class="w-16 h-16 mx-auto mb-3 rounded-xl"
-        />
-        <h3 class="text-lg font-bold text-gray-800 mb-2">
-          Add Sparkles to Home Screen
-        </h3>
-        <p class="text-sm text-gray-600 mb-4">
-          Tap the <strong>Share</strong> icon (<span>🔼</span>) then select
-          <strong>“Add to Home Screen”</strong> to install the app.
-        </p>
-        <button
-          id="closePwaGuide"
-          class="mt-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-2 rounded-full"
-        >
-          Got it
-        </button>
+    <!-- Install App Banner -->
+    <div id="installBanner" class="install-banner hidden">
+      <div class="install-banner-content">
+        <div>
+          <strong>Install this app</strong><br />
+          Add it to your home screen for quick access!
+        </div>
+        <div class="install-banner-actions">
+          <button id="installBtn" class="install-btn">Install</button>
+          <button id="closeBanner" class="close-btn">×</button>
+        </div>
       </div>
     </div>
-
-    <script>
-      if ("serviceWorker" in navigator) {
-        navigator.serviceWorker
-          .register("/service-worker.js")
-          .then(() => console.log("✅ Service Worker Registered"))
-          .catch((err) => console.error("SW registration failed:", err));
-      }
-    </script>
 
     <script src="app.js"></script>
   </body>

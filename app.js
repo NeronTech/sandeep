@@ -7,58 +7,28 @@ document.addEventListener("DOMContentLoaded", loadMenu);
 document.addEventListener("DOMContentLoaded", () => {
   let deferredPrompt;
   const installBtn = document.getElementById("installBtn");
-  let shownManually = false;
+  // const closeBanner = document.getElementById("closeBanner");
 
-  // --- Listen for real Chrome install event ---
   window.addEventListener("beforeinstallprompt", (e) => {
-    console.log("🎯 beforeinstallprompt event fired");
+    console.log("👍 beforeinstallprompt fired");
     e.preventDefault();
     deferredPrompt = e;
     installBtn.classList.remove("hidden");
   });
 
-  // --- Always show button after 3 seconds if not shown yet ---
-  setTimeout(() => {
-    if (installBtn.classList.contains("hidden")) {
-      installBtn.classList.remove("hidden");
-      shownManually = true;
-    }
-  }, 3000);
-
-  // --- Button click handler ---
   installBtn.addEventListener("click", async () => {
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
-      console.log(`User response: ${outcome}`);
-      if (outcome === "accepted") {
-        showToast("✅ App is installing...");
-      } else {
-        showToast("ℹ️ Install canceled");
-      }
-      deferredPrompt = null;
-    } else if (shownManually) {
-      showToast("ℹ️ To install: Tap ⋮ → Add to Home Screen");
-    }
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    console.log(`User response: ${outcome}`);
+    deferredPrompt = null;
     installBtn.classList.add("hidden");
   });
 
-  window.addEventListener("appinstalled", () => {
-    console.log("🎉 App installed successfully!");
-    showToast("🎉 App installed successfully!");
-  });
-
-  // --- Toast function ---
-  function showToast(msg) {
-    const toast = document.createElement("div");
-    toast.textContent = msg;
-    toast.className =
-      "fixed bottom-20 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white px-4 py-2 rounded-full shadow-lg text-sm animate-fadeInOut";
-    document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 3500);
-  }
+  // closeBanner.addEventListener("click", () => {
+  //   installBanner.classList.add("hidden");
+  // });
 });
-
 
 const menuContainer = document.getElementById("menuItems");
 

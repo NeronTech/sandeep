@@ -1387,7 +1387,7 @@
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", () => {
           navigator.serviceWorker
-            .register("/service-worker.js")
+            .register("https://nerontech.github.io/sandeep/service-worker.js")
             .then(() => {
               console.log("Service Worker registered.");
             })
@@ -1395,28 +1395,39 @@
         });
       }
 
-      // Custom install button handling
-      let deferredPrompt;
-      const installBtn = document.getElementById("installBtn");
+      let deferredPrompt; // to store the event
+
       window.addEventListener("beforeinstallprompt", (e) => {
+        // Prevent the mini-infobar from appearing on mobile
         e.preventDefault();
+
+        // Save the event so it can be triggered later
         deferredPrompt = e;
-        installBtn.hidden = false;
+
+        // Show your install button
+        const installBtn = document.getElementById("installBtn");
+        installBtn.classList.remove("hidden");
+
+        installBtn.addEventListener("click", async () => {
+          // Hide the button
+          installBtn.classList.add("hidden");
+
+          // Show the install prompt
+          deferredPrompt.prompt();
+
+          // Wait for the user's response
+          const { outcome } = await deferredPrompt.userChoice;
+          console.log(`User response to the install prompt: ${outcome}`);
+
+          // Clear the event (it can only be used once)
+          deferredPrompt = null;
+        });
       });
 
-      installBtn.addEventListener("click", async () => {
-        if (!deferredPrompt) return;
-        deferredPrompt.prompt();
-        const choice = await deferredPrompt.userChoice;
-        console.log("User choice:", choice);
-        deferredPrompt = null;
-        installBtn.hidden = true;
-      });
-
-      // Optionally hide the button if already installed
+      // Optional: detect if app is already installed
       window.addEventListener("appinstalled", () => {
-        console.log("PWA was installed");
-        if (installBtn) installBtn.hidden = true;
+        console.log("PWA installed successfully!");
+        document.getElementById("installBtn")?.classList.add("hidden");
       });
     </script>
 

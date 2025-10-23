@@ -4,32 +4,6 @@ const GAS_URL =
 
 document.addEventListener("DOMContentLoaded", loadMenu);
 
-document.addEventListener("DOMContentLoaded", () => {
-  let deferredPrompt;
-  const installBtn = document.getElementById("installBtn");
-  // const closeBanner = document.getElementById("closeBanner");
-
-  window.addEventListener("beforeinstallprompt", (e) => {
-    console.log("👍 beforeinstallprompt fired");
-    e.preventDefault();
-    deferredPrompt = e;
-    installBtn.classList.remove("hidden");
-  });
-
-  installBtn.addEventListener("click", async () => {
-    if (!deferredPrompt) return;
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    console.log(`User response: ${outcome}`);
-    deferredPrompt = null;
-    installBtn.classList.add("hidden");
-  });
-
-  // closeBanner.addEventListener("click", () => {
-  //   installBanner.classList.add("hidden");
-  // });
-});
-
 const menuContainer = document.getElementById("menuItems");
 
 // ======= OPEN ORDER MODAL BUTTONS =======

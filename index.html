@@ -255,7 +255,7 @@
         .group:hover .right-arrow {
           opacity: 1;
         }
-      } 
+      }
     </style>
   </head>
   <body class="bg-gradient-to-b from-white to-gray-50 font-sans">
@@ -267,20 +267,24 @@
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16">
           <a href="#home" class="flex items-center space-x-3">
-            <div
-              class="w-10 h-10 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center shadow-lg"
-            >
-              <span class="text-white font-bold text-lg">S</span>
-            </div>
-            <div class="flex flex-col">
+            <img
+              alt="Smoothies & More Logo"
+              src="/icons/windows11/LargeTile.scale-400.png"
+              class="h-10 w-auto sm:h-12 transition-all duration-200"
+              loading="lazy"
+            />
+            <div class="flex flex-col leading-tight">
               <span
-                class="text-xl font-bold text-gray-900 leading-tight"
+                class="text-lg sm:text-xl font-bold text-gray-900"
                 style="font-family: Pacifico, serif"
-                >Smoothies &amp; More</span
               >
-              <span class="text-xs text-gray-600 font-small -mt-1"
-                >Home of Delicious Smoothies &amp; Snacks</span
+                Smoothies &amp; More
+              </span>
+              <span
+                class="text-[10px] sm:text-xs text-gray-600 font-medium -mt-0.5"
               >
+                Home of Delicious Smoothies &amp; Snacks
+              </span>
             </div>
           </a>
           <nav class="hidden md:flex items-center space-x-8">
@@ -1379,12 +1383,41 @@
     </div>
 
     <script>
+      // Service worker registration
       if ("serviceWorker" in navigator) {
-        navigator.serviceWorker
-          .register("/service-worker.js")
-          .then(() => console.log("✅ Service Worker Registered"))
-          .catch((err) => console.error("SW registration failed:", err));
+        window.addEventListener("load", () => {
+          navigator.serviceWorker
+            .register("/service-worker.js")
+            .then(() => {
+              console.log("Service Worker registered.");
+            })
+            .catch((err) => console.warn("SW registration failed:", err));
+        });
       }
+
+      // Custom install button handling
+      let deferredPrompt;
+      const installBtn = document.getElementById("installBtn");
+      window.addEventListener("beforeinstallprompt", (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        installBtn.hidden = false;
+      });
+
+      installBtn.addEventListener("click", async () => {
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        const choice = await deferredPrompt.userChoice;
+        console.log("User choice:", choice);
+        deferredPrompt = null;
+        installBtn.hidden = true;
+      });
+
+      // Optionally hide the button if already installed
+      window.addEventListener("appinstalled", () => {
+        console.log("PWA was installed");
+        if (installBtn) installBtn.hidden = true;
+      });
     </script>
 
     <script src="app.js"></script>

@@ -1,11 +1,10 @@
 {
   "name": "Smoothies & More",
   "short_name": "Smoothies",
-  // "start_url": "/",
-  // "scope": "/",
   "start_url": "https://nerontech.github.io/sandeep/",
   "scope": "https://nerontech.github.io/sandeep/",
   "display": "standalone",
+  "orientation": "portrait-primary",
   "background_color": "#ffffff",
   "theme_color": "#7c3aed",
   "description": "Fresh smoothies and tasty snacks \u2014 Sandeeps.",
@@ -457,6 +456,33 @@
     {
       "src": "icons/ios/1024.png",
       "sizes": "1024x1024"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "icons/screenshot-1.png",
+      "sizes": "1280x720",
+      "type": "image/png"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Order Smoothie",
+      "short_name": "Order",
+      "description": "Quickly order your favorite smoothie",
+      "url": "/order.html",
+      "icons": [
+        {
+          "src": "icons/ios/192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ],
+  "protocol_handlers": [
+    {
+      "protocol": "web+smoothie",
+      "url": "https://nerontech.github.io/sandeep/?url=%s"
     }
   ]
 }

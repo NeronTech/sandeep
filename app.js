@@ -1,5 +1,5 @@
 const GAS_URL =
-  "https://script.google.com/macros/s/AKfycbzLlbwEVAoACWPOaOTl6ZqAZAxXYAtE2mVtP3PSrYDp8ii0bBzyrq02QyDsaoSPa1RF/exec"; //ml2
+  "https://script.google.com/macros/s/AKfycbxCtfA5exLgvry8t8KTCAIUtEyy-tpY9xpOJnK5m4aSRULVY88Ck3uiBVEvlCdTTpDq/exec"; //send verify code
 // Make sure this is your latest public deployment URL
 
 document.addEventListener("DOMContentLoaded", loadMenu);

@@ -1,5 +1,5 @@
 const GAS_URL =
-  "https://script.google.com/macros/s/AKfycbzLlbwEVAoACWPOaOTl6ZqAZAxXYAtE2mVtP3PSrYDp8ii0bBzyrq02QyDsaoSPa1RF/exec"; //ml2
+  "https://script.google.com/macros/s/AKfycbxCtfA5exLgvry8t8KTCAIUtEyy-tpY9xpOJnK5m4aSRULVY88Ck3uiBVEvlCdTTpDq/exec"; //send verify code
 // Make sure this is your latest public deployment URL
 
 document.addEventListener("DOMContentLoaded", loadMenu);
@@ -103,7 +103,6 @@ document.addEventListener("DOMContentLoaded", () => {
   tabButtons[0].click();
 });
 
-
 // === Feature button toggle ===
 document.querySelectorAll(".feature-btn").forEach((btn) => {
   btn.addEventListener("click", () => {
@@ -169,8 +168,8 @@ function renderMenu(data) {
 
       <div id="menu-${safeId}" class="menu-scroll no-scrollbar">
         ${category.items
-        .map(
-          (item) => `
+          .map(
+            (item) => `
           <div class="bg-white rounded-xl shadow-md overflow-hidden flex flex-col 
                       hover:shadow-lg transform hover:-translate-y-1 transition snap-center">
             <img src="${item.imageUrl || "https://via.placeholder.com/400x300"}"
@@ -178,9 +177,13 @@ function renderMenu(data) {
                  class="h-40 w-full object-cover" />
             <div class="p-4 flex flex-col flex-grow">
               <h3 class="font-semibold text-lg mb-1">${item.name}</h3>
-              <p class="text-gray-600 text-sm flex-grow">${item.description || ""}</p>
+              <p class="text-gray-600 text-sm flex-grow">${
+                item.description || ""
+              }</p>
               <div class="mt-3 flex items-center justify-between">
-                <span class="font-bold text-indigo-600">$${parseFloat(item.price).toFixed(2)}</span>
+                <span class="font-bold text-indigo-600">$${parseFloat(
+                  item.price
+                ).toFixed(2)}</span>
                 <button class="add-to-cart-btn bg-gradient-to-r from-purple-600 to-pink-600 text-white px-3 py-1 rounded-full text-xs"
                         data-name="${item.name}"
                         data-price="${item.price}">
@@ -189,8 +192,8 @@ function renderMenu(data) {
               </div>
             </div>
           </div>`
-        )
-        .join("")}
+          )
+          .join("")}
       </div>
 
       <button class="right-arrow absolute right-2 top-1/2 -translate-y-1/2">&#8594;</button>
@@ -206,10 +209,16 @@ function renderMenu(data) {
 
     // Scroll logic
     leftArrow.addEventListener("click", () => {
-      scrollContainer.scrollBy({ left: -scrollContainer.clientWidth * 0.6, behavior: "smooth" });
+      scrollContainer.scrollBy({
+        left: -scrollContainer.clientWidth * 0.6,
+        behavior: "smooth",
+      });
     });
     rightArrow.addEventListener("click", () => {
-      scrollContainer.scrollBy({ left: scrollContainer.clientWidth * 0.6, behavior: "smooth" });
+      scrollContainer.scrollBy({
+        left: scrollContainer.clientWidth * 0.6,
+        behavior: "smooth",
+      });
     });
 
     // Center items if ≤4 (even 1 item)
@@ -241,9 +250,10 @@ function renderMenu(data) {
     { threshold: 0.2 }
   );
 
-  document.querySelectorAll(".menu-scroll > div").forEach((el) => observer.observe(el));
+  document
+    .querySelectorAll(".menu-scroll > div")
+    .forEach((el) => observer.observe(el));
 }
-
 
 // function renderMenu(items) {
 //   // console.log("Menu Items:", items);
@@ -282,7 +292,6 @@ function renderMenu(data) {
 //     menuContainer.appendChild(card);
 //   });
 // }
-
 
 function addToCart(name, price) {
   const existing = cart.find((i) => i.name === name);
@@ -341,10 +350,12 @@ function renderOrderItems() {
           <p class="text-gray-500 text-sm">$${item.price.toFixed(2)} each</p>
         </div>
         <div class="flex items-center space-x-2">
-          <button class="decrease-btn text-red-500 hover:text-red-700 font-bold px-2" data-name="${item.name
-      }">−</button>
-          <button class="increase-btn text-green-500 hover:text-green-700 font-bold px-2" data-name="${item.name
-      }">+</button>
+          <button class="decrease-btn text-red-500 hover:text-red-700 font-bold px-2" data-name="${
+            item.name
+          }">−</button>
+          <button class="increase-btn text-green-500 hover:text-green-700 font-bold px-2" data-name="${
+            item.name
+          }">+</button>
         </div>
       `;
     orderItemsContainer.appendChild(div);
@@ -489,8 +500,14 @@ const totalSection = document.getElementById("orderTotal");
 const observer = new MutationObserver(syncOrderSummary);
 
 // Watch both items and total for updates
-if (orderSection) observer.observe(orderSection, { childList: true, subtree: true });
-if (totalSection) observer.observe(totalSection, { childList: true, characterData: true, subtree: true });
+if (orderSection)
+  observer.observe(orderSection, { childList: true, subtree: true });
+if (totalSection)
+  observer.observe(totalSection, {
+    childList: true,
+    characterData: true,
+    subtree: true,
+  });
 
 // Initial load
 document.addEventListener("DOMContentLoaded", syncOrderSummary);
@@ -523,7 +540,8 @@ placeOrderBtn.addEventListener("click", () => {
   document.getElementById("summaryPayment").textContent = payment;
 
   // (Optional) You can dynamically calculate totals here
-  document.getElementById("summaryTotal").textContent = totalSection.textContent;
+  document.getElementById("summaryTotal").textContent =
+    totalSection.textContent;
 
   // Show modal
   checkoutModal.classList.remove("hidden");
@@ -645,13 +663,20 @@ const SERVICE_CENTER = { lat: 19.076, lon: 72.8777 }; // Example: Mumbai center
 const SERVICE_RADIUS_KM = 10;
 
 function validateServiceArea(lat, lon) {
-  const distance = getDistanceFromLatLonInKm(lat, lon, SERVICE_CENTER.lat, SERVICE_CENTER.lon);
+  const distance = getDistanceFromLatLonInKm(
+    lat,
+    lon,
+    SERVICE_CENTER.lat,
+    SERVICE_CENTER.lon
+  );
 
   if (distance <= SERVICE_RADIUS_KM) {
-    addressValidationMsg.textContent = "✅ Your location is serviceable for delivery.";
+    addressValidationMsg.textContent =
+      "✅ Your location is serviceable for delivery.";
     addressValidationMsg.className = "text-green-600 text-sm mt-1";
   } else {
-    addressValidationMsg.textContent = "❌ Sorry, we don’t deliver to your area yet.";
+    addressValidationMsg.textContent =
+      "❌ Sorry, we don’t deliver to your area yet.";
     addressValidationMsg.className = "text-red-600 text-sm mt-1";
   }
 }
@@ -662,8 +687,10 @@ function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
   const dLon = deg2rad(lon2 - lon1);
   const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
-    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    Math.cos(deg2rad(lat1)) *
+      Math.cos(deg2rad(lat2)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c;
 }
@@ -677,7 +704,9 @@ addressInput.addEventListener("blur", async () => {
 
   // Convert address → coordinates using Geocoding
   const query = encodeURIComponent(addressInput.value.trim());
-  const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}`);
+  const res = await fetch(
+    `https://nominatim.openstreetmap.org/search?format=json&q=${query}`
+  );
   const data = await res.json();
 
   if (data.length > 0) {
@@ -694,7 +723,7 @@ document.getElementById("sendCodeBtn").onclick = async () => {
   const email = document.getElementById("customerEmail").value.trim();
   const res = await sendToGAS({
     action: "send-code",
-    email
+    email,
   });
   showToaster(res.message);
 };
@@ -706,7 +735,7 @@ document.getElementById("verifyCodeBtn").onclick = async () => {
   const res = await sendToGAS({
     action: "verify-code",
     email,
-    code
+    code,
   });
   showToaster(res.message);
 
@@ -841,7 +870,7 @@ async function submitOrder(order) {
     amount,
   });
   showLoader(true);
-  showToast('Order placed successfully! We will contact you soon.');
+  showToast("Order placed successfully! We will contact you soon.");
   cart = [];
   updateCartCount();
   closeOrderModal();
@@ -879,7 +908,7 @@ async function submitContactUs(data) {
     message,
   });
   showLoader(true);
-  showToast('Message sent. We will get back to you soon!');
+  showToast("Message sent. We will get back to you soon!");
   contactForm.reset();
   showLoader(false);
 }
@@ -933,7 +962,9 @@ document.getElementById("captureLoginBtn").onclick = async () => {
   }
 
   // Convert face descriptor to JSON
-  const currentDescriptor = JSON.stringify(Array.from(detections[0].descriptor));
+  const currentDescriptor = JSON.stringify(
+    Array.from(detections[0].descriptor)
+  );
   // console.log("Current Descriptor:", currentDescriptor);
 
   // Stop camera
@@ -966,6 +997,120 @@ document.getElementById("captureLoginBtn").onclick = async () => {
     showToaster("❌ Face not recognized.", "#dc2626");
   }
 };
+
+// === Send Code to Google Apps Script ===
+const verifyForm = document.getElementById("verifyForm");
+const otpForm = document.getElementById("otpForm");
+const step1 = document.getElementById("step1");
+const step2 = document.getElementById("step2");
+
+let currentContact = ""; // store user contact
+
+if (verifyForm) {
+  verifyForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const contact = document.getElementById("contactInput").value.trim();
+    const messageEl = document.getElementById("verifyMessage");
+
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const indianPhonePattern = /^(\+91)?[6-9]\d{9}$/;
+
+    let isEmail = emailPattern.test(contact);
+    let isPhone = indianPhonePattern.test(contact);
+
+    if (!isEmail && !isPhone) {
+      messageEl.textContent =
+        "Please enter a valid email address or Indian mobile number.";
+      messageEl.classList.remove("hidden", "text-green-600");
+      messageEl.classList.add("text-red-600");
+      return;
+    }
+
+    messageEl.textContent = "Sending code...";
+    messageEl.classList.remove("hidden", "text-red-600");
+    messageEl.classList.add("text-gray-600");
+
+    try {
+      const response = await sendToGAS({
+        action: "send-code",
+        contact,
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        messageEl.textContent = "Verification code sent ✅";
+        messageEl.classList.remove("text-gray-600");
+        messageEl.classList.add("text-green-600");
+        currentContact = contact;
+
+        // Move to OTP step
+        setTimeout(() => {
+          step1.classList.add("hidden");
+          step2.classList.remove("hidden");
+        }, 1000);
+      } else {
+        messageEl.textContent = result.message || "Failed to send code.";
+        messageEl.classList.remove("text-gray-600");
+        messageEl.classList.add("text-red-600");
+      }
+    } catch (err) {
+      console.error(err);
+      messageEl.textContent = "Error sending code. Please try again later.";
+      messageEl.classList.remove("text-gray-600");
+      messageEl.classList.add("text-red-600");
+    }
+  });
+}
+
+// === Step 2: Verify OTP ===
+if (otpForm) {
+  otpForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const otp = document.getElementById("otpInput").value.trim();
+    const messageEl = document.getElementById("otpMessage");
+
+    if (!/^\d{6}$/.test(otp)) {
+      messageEl.textContent = "Please enter a valid 6-digit code.";
+      messageEl.classList.remove("hidden", "text-green-600");
+      messageEl.classList.add("text-red-600");
+      return;
+    }
+
+    messageEl.textContent = "Verifying code...";
+    messageEl.classList.remove("hidden", "text-red-600");
+    messageEl.classList.add("text-gray-600");
+
+    try {
+      const response = await sendToGAS({
+        action: "verify-code",
+        otp
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        messageEl.textContent = "Verification successful 🎉";
+        messageEl.classList.remove("text-gray-600");
+        messageEl.classList.add("text-green-600");
+        localStorage.setItem("smoothies_verified", "true");
+
+        setTimeout(() => {
+          document.getElementById("verifyModal").classList.add("hidden");
+        }, 1500);
+      } else {
+        messageEl.textContent = "Invalid or expired code ❌";
+        messageEl.classList.remove("text-gray-600");
+        messageEl.classList.add("text-red-600");
+      }
+    } catch (err) {
+      console.error(err);
+      messageEl.textContent = "Error verifying code.";
+      messageEl.classList.remove("text-gray-600");
+      messageEl.classList.add("text-red-600");
+    }
+  });
+}
 
 async function sendToGAS(payload) {
   try {

@@ -1342,6 +1342,68 @@
       </div>
     </div>
 
+    <!-- OTP Verification Modal -->
+    <div
+      id="verifyModal"
+      class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+    >
+      <div
+        class="bg-white rounded-2xl shadow-xl p-6 w-11/12 max-w-sm text-center animate-fadeIn"
+      >
+        <h2 class="text-xl font-bold text-gray-900 mb-2">
+          Verify Your Account 🔒
+        </h2>
+
+        <!-- STEP 1: Enter contact -->
+        <div id="step1">
+          <p class="text-gray-600 mb-5">
+            Enter your email or Indian mobile number to receive a verification
+            code.
+          </p>
+          <form id="verifyForm" class="flex flex-col space-y-3">
+            <input
+              type="text"
+              id="contactInput"
+              placeholder="e.g. +919812345678 or name@email.com"
+              required
+              class="border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-pink-400"
+            />
+            <button
+              type="submit"
+              class="bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold px-4 py-2 rounded-lg shadow hover:from-purple-700 hover:to-pink-700 transition"
+            >
+              Send Code
+            </button>
+            <span id="verifyMessage" class="hidden text-sm"></span>
+          </form>
+        </div>
+
+        <!-- STEP 2: Enter OTP -->
+        <div id="step2" class="hidden">
+          <p class="text-gray-600 mb-5">
+            We’ve sent a 6-digit verification code. Please enter it below.
+          </p>
+          <form id="otpForm" class="flex flex-col space-y-3">
+            <input
+              type="text"
+              id="otpInput"
+              placeholder="Enter verification code"
+              required
+              maxlength="6"
+              class="border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400 text-center tracking-widest text-lg"
+            />
+            <button
+              type="submit"
+              class="bg-gradient-to-r from-green-600 to-teal-600 text-white font-semibold px-4 py-2 rounded-lg shadow hover:from-green-700 hover:to-teal-700 transition"
+            >
+              Verify Code
+            </button>
+            <span id="otpMessage" class="hidden text-sm"></span>
+          </form>
+        </div>
+      </div>
+    </div>
+
     <p id="msg"></p>
     <div id="toastFaceRec"></div>
     <div id="loader">⏳ Loading...</div>
@@ -1428,6 +1490,13 @@
       window.addEventListener("appinstalled", () => {
         console.log("PWA installed successfully!");
         document.getElementById("installBtn")?.classList.add("hidden");
+      });
+
+      // ✅ After installation, show verification modal
+      window.addEventListener("appinstalled", () => {
+        console.log("PWA installed successfully!");
+        const modal = document.getElementById("verifyModal");
+        if (modal) modal.classList.remove("hidden");
       });
     </script>
 

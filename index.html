@@ -1444,6 +1444,11 @@
       </button>
     </div>
 
+    <script
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBcpApXaxF5oRAYsQ0-yqj2M_jODFNzMBM&callback=initAutocomplete&libraries=places&v=weekly"
+      defer
+    ></script>
+
     <script>
       // Service worker registration
       if ("serviceWorker" in navigator) {
@@ -1498,6 +1503,81 @@
         const modal = document.getElementById("verifyModal");
         if (modal) modal.classList.remove("hidden");
       });
+
+      let autocomplete;
+
+      // Initialize Google Autocomplete
+      function initAutocomplete() {
+        const input = document.getElementById("customerAddress");
+        if (!input) return console.error("Address input not found");
+
+        autocomplete = new google.maps.places.Autocomplete(input, {
+          types: ["geocode"],
+          fields: ["formatted_address", "geometry", "address_components"],
+        });
+
+        // Optional: Restrict to India
+        // autocomplete.setComponentRestrictions({ country: ["in"] });
+
+        autocomplete.addListener("place_changed", () => {
+          const place = autocomplete.getPlace();
+          if (!place || !place.formatted_address) return;
+          console.log("📍 Selected address:", place.formatted_address);
+        });
+      }
+
+      // Use My Location Button
+      document.addEventListener("DOMContentLoaded", () => {
+        const btn = document.getElementById("getLocationBtn");
+        const addressInput = document.getElementById("customerAddress");
+
+        btn.addEventListener("click", () => {
+          if (!navigator.geolocation) {
+            alert("Geolocation is not supported by your browser.");
+            return;
+          }
+
+          btn.disabled = true;
+          btn.textContent = "📍 Locating...";
+
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              const lat = position.coords.latitude;
+              const lng = position.coords.longitude;
+              console.log(`✅ Location found: ${lat}, ${lng}`);
+              reverseGeocode(lat, lng, addressInput, btn);
+            },
+            (error) => {
+              console.error("❌ Error getting location:", error);
+              alert(
+                "Unable to retrieve your location. Please type your address instead."
+              );
+              btn.disabled = false;
+              btn.textContent = "📍 Use My Location";
+            }
+          );
+        });
+      });
+
+      // Convert Lat/Lng to Address
+      function reverseGeocode(lat, lng, inputEl, btnEl) {
+        const geocoder = new google.maps.Geocoder();
+        const latlng = { lat, lng };
+
+        geocoder.geocode({ location: latlng }, (results, status) => {
+          btnEl.disabled = false;
+          btnEl.textContent = "📍 Use My Location";
+
+          if (status === "OK" && results[0]) {
+            const address = results[0].formatted_address;
+            inputEl.value = address;
+            console.log("🏠 Reverse geocoded address:", address);
+          } else {
+            console.error("Geocoder failed:", status);
+            alert("Failed to get address from location.");
+          }
+        });
+      }
     </script>
 
     <script src="app.js"></script>

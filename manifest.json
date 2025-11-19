@@ -1,6 +1,8 @@
 {
   "name": "Smoothies & More",
   "short_name": "Smoothies",
+  // "start_url": "./",
+  // "scope": "./",
   "start_url": "https://nerontech.github.io/sandeep/",
   "scope": "https://nerontech.github.io/sandeep/",
   "display": "standalone",

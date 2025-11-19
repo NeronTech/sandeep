@@ -1004,7 +1004,7 @@
           </div>
 
           <!-- Tab Buttons -->
-          <div class="flex justify-center gap-3 mb-6">
+          <!-- <div class="flex justify-center gap-3 mb-6">
             <button
               class="tab-btn px-2 py-1 text-xs rounded-lg bg-white text-gray-600 border border-gray-300 hover:bg-gray-100 transition"
               data-target="tab1"
@@ -1023,7 +1023,7 @@
             >
               Input Only
             </button>
-          </div>
+          </div> -->
 
           <!-- Tab Panes -->
           <div id="tab1" class="tab-pane">
@@ -1032,15 +1032,15 @@
               class="text-center"
               style="display: none !important"
             >
-              <p class="text-xs font-bold">
+              <!-- <p class="text-xs font-bold">
                 Scan your face to skip filling out the form next time.
-              </p>
-              <button id="faceRegBtn">
+              </p> -->
+              <!-- <button id="faceRegBtn">
                 <i
                   class="ri-qr-scan-2-line"
                   style="font-size: 48px; color: #3b82f6"
                 ></i>
-              </button>
+              </button> -->
             </div>
             <div id="cameraReg" class="hidden">
               <video
@@ -1139,13 +1139,13 @@
                   required
                   class="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                 />
-                <button
+                <!-- <button
                   id="sendCodeBtn"
                   type="button"
                   class="px-3 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 focus:outline-none"
                 >
                   Send Code
-                </button>
+                </button> -->
               </div>
 
               <!-- Verification Code Input -->
@@ -1465,6 +1465,7 @@
       let deferredPrompt; // to store the event
 
       window.addEventListener("beforeinstallprompt", (e) => {
+        // console.log(e);
         // Prevent the mini-infobar from appearing on mobile
         e.preventDefault();
 
@@ -1491,18 +1492,22 @@
         });
       });
 
-      // Optional: detect if app is already installed
-      window.addEventListener("appinstalled", () => {
-        console.log("PWA installed successfully!");
-        document.getElementById("installBtn")?.classList.add("hidden");
-      });
-
       // ✅ After installation, show verification modal
       window.addEventListener("appinstalled", () => {
         console.log("PWA installed successfully!");
-        const modal = document.getElementById("verifyModal");
-        if (modal) modal.classList.remove("hidden");
+        document.getElementById("installBtn")?.classList.add("hidden");
+        // Move to OTP step
+        setTimeout(() => {
+          const modal = document.getElementById("verifyModal");
+          if (modal) modal.classList.remove("hidden");
+        }, 10000);
       });
+
+      // Testing: Show verification modal 10s after page load
+      // setTimeout(() => {
+      //     const modal = document.getElementById("verifyModal");
+      //     if (modal) modal.classList.remove("hidden");
+      //   }, 10000);
 
       let autocomplete;
 
@@ -1522,7 +1527,7 @@
         autocomplete.addListener("place_changed", () => {
           const place = autocomplete.getPlace();
           if (!place || !place.formatted_address) return;
-          console.log("📍 Selected address:", place.formatted_address);
+          // console.log("📍 Selected address:", place.formatted_address);
         });
       }
 
@@ -1544,7 +1549,7 @@
             (position) => {
               const lat = position.coords.latitude;
               const lng = position.coords.longitude;
-              console.log(`✅ Location found: ${lat}, ${lng}`);
+              // console.log(`✅ Location found: ${lat}, ${lng}`);
               reverseGeocode(lat, lng, addressInput, btn);
             },
             (error) => {
@@ -1571,7 +1576,7 @@
           if (status === "OK" && results[0]) {
             const address = results[0].formatted_address;
             inputEl.value = address;
-            console.log("🏠 Reverse geocoded address:", address);
+            // console.log("🏠 Reverse geocoded address:", address);
           } else {
             console.error("Geocoder failed:", status);
             alert("Failed to get address from location.");

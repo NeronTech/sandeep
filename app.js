@@ -1,5 +1,5 @@
 const GAS_URL =
-  "https://script.google.com/macros/s/AKfycbxCtfA5exLgvry8t8KTCAIUtEyy-tpY9xpOJnK5m4aSRULVY88Ck3uiBVEvlCdTTpDq/exec"; //send verify code
+  "https://script.google.com/macros/s/AKfycbw2F0iigYL-KyY_hzpAH8Famd-wbKoCHIkTMzJxXC5VT-4NKtn7hkk-O0jzQVtTAhU4/exec"; //send verify code
 // Make sure this is your latest public deployment URL
 
 document.addEventListener("DOMContentLoaded", loadMenu);
@@ -100,7 +100,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // Auto-activate the first tab
-  tabButtons[0].click();
+  // tabButtons[0].click();
 });
 
 // === Feature button toggle ===
@@ -392,14 +392,14 @@ function renderOrderItems() {
   });
 }
 
-document.getElementById("faceRegBtn").onclick = async () => {
-  showLoader(true);
-  await loadModels();
-  await startCamera(regVideo);
-  document.getElementById("cameraReg").classList.remove("hidden");
-  showToaster("📷 Camera ready — capture your face");
-  document.getElementById("scanner").style.display = "none";
-};
+// document.getElementById("faceRegBtn").onclick = async () => {
+//   showLoader(true);
+//   await loadModels();
+//   await startCamera(regVideo);
+//   document.getElementById("cameraReg").classList.remove("hidden");
+//   showToaster("📷 Camera ready — capture your face");
+//   document.getElementById("scanner").style.display = "none";
+// };
 
 async function startCamera(videoElement) {
   try {
@@ -539,6 +539,12 @@ placeOrderBtn.addEventListener("click", () => {
   document.getElementById("summaryAddress").textContent = address;
   document.getElementById("summaryPayment").textContent = payment;
 
+  localStorage.setItem("name", name);
+  localStorage.setItem("contact", contact);
+  localStorage.setItem("email", email);
+  localStorage.setItem("address", address);
+  localStorage.setItem("paymentMethod", payment);
+
   // (Optional) You can dynamically calculate totals here
   document.getElementById("summaryTotal").textContent =
     totalSection.textContent;
@@ -554,6 +560,7 @@ cancelCheckout.addEventListener("click", () => {
 
 // ✅ Confirm button (final submit)
 confirmCheckout.addEventListener("click", async () => {
+  
   checkoutModal.classList.add("hidden");
 
   // Optionally: run card validation if needed
@@ -718,31 +725,31 @@ addressInput.addEventListener("blur", async () => {
   }
 });
 
-// 1️⃣ Send code
-document.getElementById("sendCodeBtn").onclick = async () => {
-  const email = document.getElementById("customerEmail").value.trim();
-  const res = await sendToGAS({
-    action: "send-code",
-    email,
-  });
-  showToaster(res.message);
-};
+// // 1️⃣ Send code
+// document.getElementById("sendCodeBtn").onclick = async () => {
+//   const email = document.getElementById("customerEmail").value.trim();
+//   const res = await sendToGAS({
+//     action: "send-code",
+//     email,
+//   });
+//   showToaster(res.message);
+// };
 
-// 2️⃣ Verify code
-document.getElementById("verifyCodeBtn").onclick = async () => {
-  const email = document.getElementById("customerEmail").value.trim();
-  const code = document.getElementById("emailCode").value.trim();
-  const res = await sendToGAS({
-    action: "verify-code",
-    email,
-    code,
-  });
-  showToaster(res.message);
+// // 2️⃣ Verify code
+// document.getElementById("verifyCodeBtn").onclick = async () => {
+//   const email = document.getElementById("customerEmail").value.trim();
+//   const code = document.getElementById("emailCode").value.trim();
+//   const res = await sendToGAS({
+//     action: "verify-code",
+//     email,
+//     code,
+//   });
+//   showToaster(res.message);
 
-  if (res.success) {
-    document.getElementById("emailSection").classList.add("verified");
-  }
-};
+//   if (res.success) {
+//     document.getElementById("emailSection").classList.add("verified");
+//   }
+// };
 
 const paymentSelect = document.getElementById("paymentMethod");
 const cardSection = document.getElementById("cardSection");
@@ -752,7 +759,7 @@ const cvv = document.getElementById("cvv");
 
 // 1️⃣ Show / Hide card section
 paymentSelect.addEventListener("change", () => {
-  console.log("Payment method changed to:", paymentSelect.value);
+  // console.log("Payment method changed to:", paymentSelect.value);
   if (paymentSelect.value === "card") {
     cardSection.classList.remove("hidden");
   } else {
@@ -1026,6 +1033,12 @@ if (verifyForm) {
       return;
     }
 
+    if (isPhone && !isValidIndianNumber(contact)) {
+      localStorage.setItem("contact", contact);
+    } else {
+      localStorage.setItem("email", contact);
+    }
+
     messageEl.textContent = "Sending code...";
     messageEl.classList.remove("hidden", "text-red-600");
     messageEl.classList.add("text-gray-600");
@@ -1036,9 +1049,9 @@ if (verifyForm) {
         contact,
       });
 
-      const result = await response.json();
-
-      if (result.success) {
+      // const result = await response.json();
+      // console.log("Response:", response.status);
+      if (response.status === "success") {
         messageEl.textContent = "Verification code sent ✅";
         messageEl.classList.remove("text-gray-600");
         messageEl.classList.add("text-green-600");
@@ -1050,15 +1063,15 @@ if (verifyForm) {
           step2.classList.remove("hidden");
         }, 1000);
       } else {
-        messageEl.textContent = result.message || "Failed to send code.";
+        messageEl.textContent = "Failed to send code.";
         messageEl.classList.remove("text-gray-600");
         messageEl.classList.add("text-red-600");
       }
-    } catch (err) {
-      console.error(err);
-      messageEl.textContent = "Error sending code. Please try again later.";
-      messageEl.classList.remove("text-gray-600");
-      messageEl.classList.add("text-red-600");
+    } catch (result) {
+      // console.log(result);
+      // messageEl.textContent = "Error sending code. Please try again later.";
+      // messageEl.classList.remove("text-gray-600");
+      // messageEl.classList.add("text-red-600");
     }
   });
 }
@@ -1084,12 +1097,12 @@ if (otpForm) {
     try {
       const response = await sendToGAS({
         action: "verify-code",
-        otp
+        otp,
       });
 
-      const result = await response.json();
+      // const result = await response.json();
 
-      if (result.success) {
+      if (response.status === "success") {
         messageEl.textContent = "Verification successful 🎉";
         messageEl.classList.remove("text-gray-600");
         messageEl.classList.add("text-green-600");
@@ -1104,7 +1117,7 @@ if (otpForm) {
         messageEl.classList.add("text-red-600");
       }
     } catch (err) {
-      console.error(err);
+      // console.error(err);
       messageEl.textContent = "Error verifying code.";
       messageEl.classList.remove("text-gray-600");
       messageEl.classList.add("text-red-600");
@@ -1127,3 +1140,16 @@ async function sendToGAS(payload) {
     return { message: err.message };
   }
 }
+
+window.onload = () => {
+  document.getElementById("customerName").value =
+    localStorage.getItem("name") || "";
+  document.getElementById("customerContact").value =
+    localStorage.getItem("contact") || "";
+  document.getElementById("customerEmail").value =
+    localStorage.getItem("email") || "";
+  document.getElementById("customerAddress").value =
+    localStorage.getItem("address") || "";
+  document.getElementById("paymentMethod").value =
+    localStorage.getItem("paymentMethod") || "cod";
+};

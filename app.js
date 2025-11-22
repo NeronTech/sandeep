@@ -539,11 +539,15 @@ placeOrderBtn.addEventListener("click", () => {
   document.getElementById("summaryAddress").textContent = address;
   document.getElementById("summaryPayment").textContent = payment;
 
-  localStorage.setItem("name", name);
-  localStorage.setItem("contact", contact);
-  localStorage.setItem("email", email);
-  localStorage.setItem("address", address);
-  localStorage.setItem("paymentMethod", payment);
+  const isPwaInstalled = window.matchMedia(
+    "(display-mode: standalone)"
+  ).matches;
+
+  if (isPwaInstalled) {
+    localStorage.setItem("name", name);
+    localStorage.setItem("contact", contact);
+    localStorage.setItem("email", email);
+  }
 
   // (Optional) You can dynamically calculate totals here
   document.getElementById("summaryTotal").textContent =
@@ -551,7 +555,6 @@ placeOrderBtn.addEventListener("click", () => {
 
   // Show modal
   checkoutModal.classList.remove("hidden");
-
 });
 
 // ❌ Cancel button
@@ -578,12 +581,11 @@ confirmCheckout.addEventListener("click", async () => {
   document
     .getElementById("orderForm")
     .dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
-    showLoader(true);
+  
 });
 
 // On order form submit
 document.getElementById("orderForm").addEventListener("submit", (e) => {
-  
   e.preventDefault();
   if (cart.length === 0) {
     showToast("Your cart is empty.");
@@ -601,6 +603,7 @@ document.getElementById("orderForm").addEventListener("submit", (e) => {
     const valid = validateCardDetails();
     if (!valid) return;
   }
+  showLoader(true);
 
   const name = e.target.customerName.value.trim();
   const contact = e.target.customerContact.value.trim();
@@ -847,14 +850,13 @@ async function registerUser(user) {
     contact,
     email,
     address,
-    payment
+    payment,
   });
   showMsg(res.message);
 }
 
 // Submit Order
 async function submitOrder(order) {
-  
   const name = order.customerName;
   const contact = order.customerContact;
   const email = order.customerEmail;
@@ -875,7 +877,7 @@ async function submitOrder(order) {
     showToast("Please fill all required fields.");
     return;
   }
-  
+
   const res = await sendToGAS({
     action: "order",
     name,
@@ -1158,8 +1160,4 @@ window.onload = () => {
     localStorage.getItem("contact") || "";
   document.getElementById("customerEmail").value =
     localStorage.getItem("email") || "";
-  document.getElementById("customerAddress").value =
-    localStorage.getItem("address") || "";
-  document.getElementById("paymentMethod").value =
-    localStorage.getItem("paymentMethod") || "cod";
 };

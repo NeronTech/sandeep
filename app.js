@@ -1,5 +1,5 @@
 const GAS_URL =
-  "https://script.google.com/macros/s/AKfycbw2F0iigYL-KyY_hzpAH8Famd-wbKoCHIkTMzJxXC5VT-4NKtn7hkk-O0jzQVtTAhU4/exec"; //send verify code
+  "https://script.google.com/macros/s/AKfycbwp7k7av9vuUvyqKj3umOzlfaUPboGlso4QKq07XjfzFIsBVTpJ3JiNVRykbanYdeJD/exec"; //existing user
 // Make sure this is your latest public deployment URL
 
 document.addEventListener("DOMContentLoaded", loadMenu);
@@ -551,6 +551,7 @@ placeOrderBtn.addEventListener("click", () => {
 
   // Show modal
   checkoutModal.classList.remove("hidden");
+
 });
 
 // ❌ Cancel button
@@ -560,7 +561,6 @@ cancelCheckout.addEventListener("click", () => {
 
 // ✅ Confirm button (final submit)
 confirmCheckout.addEventListener("click", async () => {
-  
   checkoutModal.classList.add("hidden");
 
   // Optionally: run card validation if needed
@@ -573,11 +573,17 @@ confirmCheckout.addEventListener("click", async () => {
   showToaster("🧾 Submitting your order...", "#2563eb");
 
   // Submit your form here
-  document.getElementById("orderForm").submit();
+  // document.getElementById("orderForm").submit();
+  // Trigger programmatically
+  document
+    .getElementById("orderForm")
+    .dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
+    showLoader(true);
 });
 
 // On order form submit
 document.getElementById("orderForm").addEventListener("submit", (e) => {
+  
   e.preventDefault();
   if (cart.length === 0) {
     showToast("Your cart is empty.");
@@ -827,9 +833,10 @@ async function registerUser(user) {
   const name = user.customerName;
   const contact = user.customerContact;
   const email = user.customerEmail;
+  const address = user.customerAddress;
   const payment = user.paymentMethod;
 
-  if (!name || !contact || !email || !paymentMethod) {
+  if (!name || !contact || !email || !address || !paymentMethod) {
     showToast("Please fill all required fields.");
     return;
   }
@@ -839,26 +846,28 @@ async function registerUser(user) {
     name,
     contact,
     email,
-    payment,
-    regDescriptor,
-    regFaceImage,
+    address,
+    payment
   });
   showMsg(res.message);
 }
 
 // Submit Order
 async function submitOrder(order) {
+  
   const name = order.customerName;
   const contact = order.customerContact;
   const email = order.customerEmail;
+  const address = order.customerAddress;
   const payment = order.paymentMethod;
-  const items = order.items;
+  const items = JSON.stringify(order.items);
   const amount = order.total;
 
   if (
     !name ||
     !contact ||
     !email ||
+    !address ||
     !payment ||
     items.length === 0 ||
     amount <= 0
@@ -866,17 +875,18 @@ async function submitOrder(order) {
     showToast("Please fill all required fields.");
     return;
   }
-
+  
   const res = await sendToGAS({
     action: "order",
     name,
     contact,
     email,
+    address,
     payment,
     items,
     amount,
   });
-  showLoader(true);
+  showLoader(false);
   showToast("Order placed successfully! We will contact you soon.");
   cart = [];
   updateCartCount();

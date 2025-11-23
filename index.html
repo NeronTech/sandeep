@@ -1497,11 +1497,27 @@
         console.log("PWA installed successfully!");
         document.getElementById("installBtn")?.classList.add("hidden");
         // Move to OTP step
-        setTimeout(() => {
-          const modal = document.getElementById("verifyModal");
-          if (modal) modal.classList.remove("hidden");
-        }, 20000);
+        // setTimeout(() => {
+        //   const modal = document.getElementById("verifyModal");
+        //   if (modal) modal.classList.remove("hidden");
+        // }, 20000);
       });
+
+      const isPWA =
+        window.matchMedia("(display-mode: standalone)").matches ||
+        window.navigator.standalone === true; // iOS
+
+      if (isPWA) {
+        console.log("App opened as installed PWA");
+
+        // Show modal if not shown before
+        if (!localStorage.getItem("verifyShown")) {
+          setTimeout(() => {
+            document.getElementById("verifyModal")?.classList.remove("hidden");
+            localStorage.setItem("verifyShown", "true");
+          }, 2000);
+        }
+      }
 
       // Testing: Show verification modal 10s after page load
       // setTimeout(() => {

@@ -1,5 +1,5 @@
 const GAS_URL =
-  "https://script.google.com/macros/s/AKfycbwp7k7av9vuUvyqKj3umOzlfaUPboGlso4QKq07XjfzFIsBVTpJ3JiNVRykbanYdeJD/exec"; //existing user
+  "https://script.google.com/macros/s/AKfycbxx8HiQH-awVksgH1jVIIAWTbjsRff0jIhaeAUNcSPOsw7eRdapr2Na-W6fh8c3p1Ei/exec"; //twilio sms
 // Make sure this is your latest public deployment URL
 
 document.addEventListener("DOMContentLoaded", loadMenu);

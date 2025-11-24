@@ -1497,10 +1497,9 @@
         console.log("PWA installed successfully!");
         document.getElementById("installBtn")?.classList.add("hidden");
         // Move to OTP step
-        // setTimeout(() => {
-        //   const modal = document.getElementById("verifyModal");
-        //   if (modal) modal.classList.remove("hidden");
-        // }, 20000);
+        setTimeout(() => {
+          window.location.reload(true);
+        }, 1000);
       });
 
       const isPWA =
@@ -1508,7 +1507,7 @@
         window.navigator.standalone === true; // iOS
 
       if (isPWA) {
-        console.log("App opened as installed PWA");
+        // console.log("App opened as installed PWA");
 
         // Show modal if not shown before
         if (!localStorage.getItem("verifyShown")) {

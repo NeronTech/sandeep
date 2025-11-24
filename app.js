@@ -1,5 +1,5 @@
 const GAS_URL =
-  "https://script.google.com/macros/s/AKfycbxx8HiQH-awVksgH1jVIIAWTbjsRff0jIhaeAUNcSPOsw7eRdapr2Na-W6fh8c3p1Ei/exec"; //twilio sms
+  "https://script.google.com/macros/s/AKfycbw8k_HAHeIthNUk5j35pkt2bTL_kGdT54w1DPdT9NMxQ537rfAsiahakiZhBsiZ_PDZ/exec"; //test sms
 // Make sure this is your latest public deployment URL
 
 document.addEventListener("DOMContentLoaded", loadMenu);
@@ -581,7 +581,6 @@ confirmCheckout.addEventListener("click", async () => {
   document
     .getElementById("orderForm")
     .dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
-  
 });
 
 // On order form submit
@@ -894,6 +893,9 @@ async function submitOrder(order) {
   updateCartCount();
   closeOrderModal();
   orderForm.reset();
+  setTimeout(() => {
+    window.location.reload(true);
+  }, 1000);
   // showMsg(res.message);
 }
 
@@ -1037,24 +1039,24 @@ if (verifyForm) {
     let isEmail = emailPattern.test(contact);
     let isPhone = indianPhonePattern.test(contact);
 
-    if (!isEmail && !isPhone) {
-      messageEl.textContent =
-        "Please enter a valid email address or Indian mobile number.";
-      messageEl.classList.remove("hidden", "text-green-600");
-      messageEl.classList.add("text-red-600");
-      return;
-    }
+    // if (!isEmail && !isPhone) {
+    //   messageEl.textContent =
+    //     "Please enter a valid email address or Indian mobile number.";
+    //   messageEl.classList.remove("hidden", "text-green-600");
+    //   messageEl.classList.add("text-red-600");
+    //   return;
+    // }
 
-    if (isPhone && !isValidIndianNumber(contact)) {
-      localStorage.setItem("contact", contact);
-    } else {
-      localStorage.setItem("email", contact);
-    }
+    // if (isPhone) {
+    //   localStorage.setItem("contact", contact);
+    // } else {
+    //   console.log("Storing email:", contact);
+    //   localStorage.setItem("email", contact);
+    // }
 
     messageEl.textContent = "Sending code...";
     messageEl.classList.remove("hidden", "text-red-600");
     messageEl.classList.add("text-gray-600");
-
     try {
       const response = await sendToGAS({
         action: "send-code",

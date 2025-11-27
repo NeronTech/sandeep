@@ -1,5 +1,5 @@
 const GAS_URL =
-  "https://script.google.com/macros/s/AKfycbw8k_HAHeIthNUk5j35pkt2bTL_kGdT54w1DPdT9NMxQ537rfAsiahakiZhBsiZ_PDZ/exec"; //test sms
+  "https://script.google.com/macros/s/AKfycbwvoMt2Tz3JSdWwo29cod-ru0XpGp3IDxZ5xnd-CAVZ4lc4joD8SBnKGeDKMcgRVwi6/exec"; //update menu render
 // Make sure this is your latest public deployment URL
 
 document.addEventListener("DOMContentLoaded", loadMenu);
@@ -690,9 +690,9 @@ function validateServiceArea(lat, lon) {
       "✅ Your location is serviceable for delivery.";
     addressValidationMsg.className = "text-green-600 text-sm mt-1";
   } else {
-    addressValidationMsg.textContent =
-      "❌ Sorry, we don’t deliver to your area yet.";
-    addressValidationMsg.className = "text-red-600 text-sm mt-1";
+    // addressValidationMsg.textContent =
+    //   "❌ Sorry, we don’t deliver to your area yet.";
+    // addressValidationMsg.className = "text-red-600 text-sm mt-1";
   }
 }
 
@@ -728,8 +728,8 @@ addressInput.addEventListener("blur", async () => {
     const { lat, lon } = data[0];
     validateServiceArea(parseFloat(lat), parseFloat(lon));
   } else {
-    addressValidationMsg.textContent = "⚠️ Unable to locate this address.";
-    addressValidationMsg.className = "text-yellow-600 text-sm mt-1";
+    // addressValidationMsg.textContent = "⚠️ Unable to locate this address.";
+    // addressValidationMsg.className = "text-yellow-600 text-sm mt-1";
   }
 });
 

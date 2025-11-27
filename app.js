@@ -310,6 +310,10 @@ function showOrderModal() {
     showToast("Your cart is empty. Please add items to order.");
     return;
   }
+  document.getElementById("customerContact").value =
+    localStorage.getItem("contact") || "";
+  document.getElementById("customerEmail").value =
+    localStorage.getItem("email") || "";
   document.getElementById("scanner").style.display = "block";
   document.getElementById("scannerLogin").style.display = "block";
   renderOrderItems();
@@ -1070,6 +1074,13 @@ if (verifyForm) {
         messageEl.classList.remove("text-gray-600");
         messageEl.classList.add("text-green-600");
         currentContact = contact;
+        if (isPhone) {
+          localStorage.setItem("contact", contact);
+        }
+
+        if (isEmail) {
+          localStorage.setItem("email", contact);
+        }
 
         // Move to OTP step
         setTimeout(() => {
@@ -1124,6 +1135,7 @@ if (otpForm) {
 
         setTimeout(() => {
           document.getElementById("verifyModal").classList.add("hidden");
+          window.location.reload(true);
         }, 1500);
       } else {
         messageEl.textContent = "Invalid or expired code ❌";
